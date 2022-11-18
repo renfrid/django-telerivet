@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from apps.citizen.models import Citizen
 from apps.menu.models import *
+from apps.location.models import *
 from .utils import *
 
 @csrf_exempt
@@ -31,8 +32,6 @@ def webhook(request):
             else:        
                 #check menu session if active=0
                 menu_session = MenuSession.objects.filter(phone=from_number, active=0)
-
-                print("sessions => " + str(menu_session.count()))
 
                 if menu_session.count() > 0:
                     # get latest menu session
@@ -67,12 +66,11 @@ def webhook(request):
             #return message 
             message = "Phone number already registered" 
 
-
-
         #return response to telerivet 
         return HttpResponse(json.dumps({
             'messages': [
                 {'content': message}
             ]
         }), 'application/json')
+
 

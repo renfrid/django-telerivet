@@ -4,6 +4,7 @@ import json
 import requests
 from django.http import JsonResponse
 from apps.menu.models import *
+from apps.location.models import *
 
 #init menu
 def init_menu(channel, phone):
@@ -22,13 +23,13 @@ def init_menu(channel, phone):
     session.save()
 
     # process menu
-    message = process_menu(menu_id=menu.id)
+    message = process_menu(menu_id=menu.id, phone=phone)
 
     # response
     return message
 
 #provess menu
-def process_menu(menu_id):
+def process_menu(menu_id, phone):
     # variables
     message = ""
 
@@ -36,17 +37,35 @@ def process_menu(menu_id):
     menu = Menu.objects.get(pk=menu_id)
     message = menu.title
 
-    # get sub menu
-    sub_menus = SubMenu.objects.filter(menu_id=menu_id).order_by('view_id')
+    #modify menu to call ID Number
+    if(menu.flag == 'Jihakiki_Verify_ID'):
+        menu_session = MenuSession.objects.filter(menu_id=5, phone=phone).last()
 
-    if(sub_menus):
+        if menu_session:
+            message = message.replace("ID_Number", menu_session.values)
+
+    #if menu require to pull data
+    if menu.pull == 1:
+        response = requests.get(menu.pull_url)
+
         sub_message = ""
-        for val in sub_menus:
-            sub_message += val.view_id + ". " + val.title + "\r\n"
+        for data in response.json()['response']:
+            sub_message += data
 
-        message = message + "\r\n" + sub_message
+        message = message + "\r\n" + sub_message  
 
-    # response
+    elif menu.pull == 0:     
+        # get sub menu
+        sub_menus = SubMenu.objects.filter(menu_id=menu_id).order_by('view_id')
+
+        if(sub_menus):
+            sub_message = ""
+            for val in sub_menus:
+                sub_message += val.view_id + ". " + val.title + "\r\n"
+
+            message = message + "\r\n" + sub_message
+
+    #message
     return message    
 
 #check if there menu links
@@ -90,7 +109,7 @@ def next_menu(channel, phone, uuid, menu_id, key):
             session.save()
 
             # process menu
-            message = process_menu(menu_link[0].link_id)            
+            message = process_menu(menu_link[0].link_id, phone)            
         else:
             # message
             message = "Invalid input"
@@ -107,7 +126,7 @@ def next_menu(channel, phone, uuid, menu_id, key):
             session.save()
 
             # process menu
-            message = process_menu(menu_link[0].link_id)
+            message = process_menu(menu_link[0].link_id, phone)
         else:
             # message
             message = "Invalid input"
@@ -163,3 +182,27 @@ def save_data_session(uuid):
         
     #browser response
     return JsonResponse({'status': 'success', 'message': "data saved"})
+
+
+#select all wards
+def get_wards(request):
+    wards = Ward.objects.all()
+
+    arr_wards = []
+    for ward in wards:
+        message = str(ward.id) + ". " + ward.name + "\r\n"
+        arr_wards.append(message)
+
+    return JsonResponse({"error": False, "response": arr_wards})
+
+
+#select all wards
+def get_villages(request):
+    villages = Village.objects.all()
+
+    arr_villages = []
+    for village in villages:
+        message = str(village.id) + ". " + village.name + "\r\n"
+        arr_villages.append(message)
+
+    return JsonResponse({"error": False, "response": arr_villages})

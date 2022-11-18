@@ -15,9 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apps.api import views as telerivet_views
+from apps.api import views as api_views
+from apps.api import utils
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('webhooks/telerivet/', telerivet_views.webhook),
+    path('webhooks/telerivet/', api_views.webhook),
+    path('wards/', utils.get_wards),
+    path('villages/', utils.get_villages),
 ]
