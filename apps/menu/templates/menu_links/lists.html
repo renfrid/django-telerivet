@@ -1,0 +1,141 @@
+{% extends 'layouts/app-with-nav.html' %}
+{% load static %}
+{% block title %} Threads {% endblock %}
+
+{% block content %}
+
+<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+    <div class="container-fluid px-4">
+        <div class="page-header-content">
+            <div class="row align-items-center justify-content-between pt-3">
+                <div class="col-auto mb-3">
+                    <h1 class="page-header-title">
+                        <div class="page-header-icon"><i data-feather="link"></i></div>
+                        Threads Linking
+                    </h1>
+                </div>
+                <div class="col-12 col-xl-auto mb-3">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main page content-->
+<div class="container-xl px-0 mt-4">
+    <div class="row">
+        <div class="col-xl-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Create New Link</h6>
+                    <hr />
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row gx-3 mb-3">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label>Menu <span class="asteriskField">*</span></label>
+                                    <select name="menu_id" id="menu_id" class="form-control" required>
+                                        <option value="">Select</option>
+                                        {% for val in menu %}
+                                        <option value="{{ val.id }}">{{ val.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label>Sub Menu</label>
+                                    <select name="sub_menu_id" id="sub_menu_id" class="form-control">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label>Link <span class="asteriskField">*</span></label>
+                                    <select name="link_id" id="link_id" class="form-control" required>
+                                        <option value="">Select</option>
+                                        {% for val in menu %}
+                                        <option value="{{ val.id }}">{{ val.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+                        </div>
+                        <!--./row -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="text-sm-end">
+                                    <a href="#" class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
+                                    <button class="btn btn-secondary text-medium btn-sm" type="submit">
+                                        Submit
+                                    </button>
+                                </div>
+                                <!--./float-right -->
+                            </div>
+                            <!--./col -->
+                        </div>
+                        <!--./row -->
+                    </form>
+                </div>
+            </div>
+
+            <table id="dt" class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th width="3%">#</th>
+                        <th width=10%>Keyword</th>
+                        <th width=32%>Menu</th>
+                        <th width="12%">Sub Menu</th>
+                        <th width="32%">Link</th>
+                        <th style="width: 40px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for val in menu_links %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{ val.menu.keyword.title|upper }}</td>
+                        <td>{{ val.menu.title }}</td>
+                        <td>{{ val.sub_menu.title }}</td>
+                        <td>{{ val.link.title }}</td>
+                        <td>
+                            <a href="#" title="Delete" class="btn btn-xss delete">
+                                <i class="fa-regular fa-trash-can text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--./container -->
+
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

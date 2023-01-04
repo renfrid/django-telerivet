@@ -1,0 +1,115 @@
+{% extends 'layouts/app-with-nav.html' %}
+{% load static %}
+{% block title %} Threads {% endblock %}
+
+{% block content %}
+
+<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+    <div class="container-fluid px-4">
+        <div class="page-header-content">
+            <div class="row align-items-center justify-content-between pt-3">
+                <div class="col-auto mb-3">
+                    <h1 class="page-header-title">
+                        <div class="page-header-icon"><i data-feather="users"></i></div>
+                        Threads
+                    </h1>
+                </div>
+                <div class="col-12 col-xl-auto mb-3">
+                    <a href="{% url 'setup:create-menu' %}" class="btn btn-sm btn-light text-primary">
+                        <i class="me-1" data-feather="add"></i> Create New
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main page content-->
+<div class="container-xl px-0 mt-4">
+    <div class="row">
+        <div class="col-xl-12 col-md-12">
+            <form method="get" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-4 col-sm-12 col-12">
+                        <div class="form-group">
+                            <select name="keyword_id" id="keyword_id" class="form-control" required>
+                                <option value="">-- Keyword -- </option>
+                                {% for val in keyword %}
+                                <option value="{{ val.id }}">{{ val.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!--./form-group -->
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                        <button class="btn btn-secondary btn-sm " type="submit">
+                            Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12 col-md-12">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <table id="dt" class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th width="3%">#</th>
+                        <th width=6%>Step</th>
+                        <th width=14%>Keyword</th>
+                        <th width=40%>Title</th>
+                        <th width="12%">Flag</th>
+                        <th width="10%">Label</th>
+                        <th style="width: 40px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for val in menu %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{ val.step }}</td>
+                        <td>{{ val.keyword.title }}</td>
+                        <td>{{ val.title }}</td>
+                        <td>{{ val.flag }}</td>
+                        <td>{{ val.label }}</td>
+                        <td>
+                            <a href="{% url 'setup:detail-menu' val.id %}" title="Delete" class="btn btn-xss">
+                                <i class="fa-regular fa-eye"></i>
+                            </a>
+
+                            <a href="{% url 'setup:edit-menu' val.id %}" title="Edit" class="btn btn-xss">
+                                <i class="fa-regular fa-pen-to-square text-secondary"></i>
+                            </a>
+
+                            <a href="{% url 'setup:delete-menu' val.id %}" title="Delete" class="btn btn-xss">
+                                <i class="fa-regular fa-trash-can text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--./container -->
+
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

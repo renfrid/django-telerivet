@@ -1,0 +1,6 @@
+<select name="neighborhood_id" id="neighborhood_id" class="form-control">
+    <option value="">Select</option>
+    {% for val in neighborhood %}
+        <option value="{{ val.id }}">{{ val.name }}</option>
+    {% endfor %}
+</select>

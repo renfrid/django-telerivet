@@ -12,7 +12,7 @@ admin.site.register(Region, RegionAdmin)
 
 #districts
 class DistrictAdmin(admin.ModelAdmin):
-    list_display = ['id','name', 'region']
+    list_display = ['id','name', 'region', 'phone']
     list_filter = ['region']
     search_fields = ['name__startwith']
     ordering = ("name",)
@@ -26,10 +26,10 @@ class VillageInline(admin.StackedInline):
 
 #wards
 class WardAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'district']
+    list_display = ['view_id', 'name', 'district']
     list_filter = ['district']
     search_fields = ['name__startwith']
-    ordering      = ("name",)
+    ordering      = ("view_id",)
     inlines       = [VillageInline]
 
 admin.site.register(Ward, WardAdmin)
@@ -41,10 +41,10 @@ class NeighborhoodInline(admin.StackedInline):
 
 #villages
 class VillageAdmin(admin.ModelAdmin):
-    list_display  = ['id', 'name', 'ward']
+    list_display  = ['view_id', 'name', 'ward']
     list_filter = ['ward']
     search_fields = ['name__startwith']
-    ordering      = ("name",)
+    ordering      = ("ward","view_id",)
     inlines       = [NeighborhoodInline]
 
 admin.site.register(Village, VillageAdmin)

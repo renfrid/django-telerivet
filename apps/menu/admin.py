@@ -2,7 +2,6 @@ from django.contrib import admin
 from .models import *
 
 # Register your models here.
-# Register your models here.
 class SubMenuInline(admin.TabularInline):
     model = SubMenu
     extra = 0
@@ -10,9 +9,9 @@ class SubMenuInline(admin.TabularInline):
 
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'flag']
+    list_display = ['sequence', 'step', 'keyword', 'title', 'flag']
     search_fields = ['title__startwith']
-    ordering = ("id",)
+    ordering = ("sequence",)
     inlines  = [SubMenuInline]
 
 
@@ -20,3 +19,7 @@ class MenuAdmin(admin.ModelAdmin):
 class MenuLinkAdmin(admin.ModelAdmin):
     list_display = ['id', 'menu', 'sub_menu', 'link']
     ordering = ("id",)
+
+@admin.register(Keyword)
+class KeywordAdmin(admin.ModelAdmin):
+    list_display = ["title"]

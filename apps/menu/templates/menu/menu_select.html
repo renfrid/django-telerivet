@@ -1,0 +1,6 @@
+<select name="menu_id" id="menu_id" class="form-control">
+    <option value="">Select</option>
+    {% for val in menu %}
+        <option value="{{ val.id }}">{{ val.title }}</option>
+    {% endfor %}
+</select>

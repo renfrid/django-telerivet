@@ -1,0 +1,89 @@
+{% extends 'layouts/app-with-nav.html' %}
+{% load static %}
+{% block title %} Leaders {% endblock %}
+
+{% block content %}
+
+<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+    <div class="container-fluid px-4">
+        <div class="page-header-content">
+            <div class="row align-items-center justify-content-between pt-3">
+                <div class="col-auto mb-3">
+                    <h1 class="page-header-title">
+                        <div class="page-header-icon"><i data-feather="users"></i></div>
+                        Leaders
+                    </h1>
+                </div>
+                <div class="col-12 col-xl-auto mb-3">
+                    <a href="{% url 'leaders:create' %}" class="btn btn-sm btn-light text-primary">
+                        <i class="me-1" data-feather="add"></i> Register VEO
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main page content-->
+<div class="container-xl px-0 mt-4">
+    <div class="row">
+        <div class="col-xl-12 col-md-12">
+            <table id="dt" class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th width="3%">#</th>
+                        <th width=18%>Full name</th>
+                        <th width="10%">Phone</th>
+                        <th width="10%">Sex</th>
+                        <th width="10%">Date of Birth</th>
+                        <th width="10%">ID Number</th>
+                        <th width="10%">House Number</th>
+                        <th width="12%">Location</th>
+                        <th style="width: 40px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for val in leaders %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{ val.name }}</td>
+                        <td>{{ val.phone }}</td>
+                        <td>
+                            {% if val.sex == '1' %}
+                            Male
+                            {% elif val.sex == '2' %}
+                            Female
+                            {% endif %}
+                        </td>
+                        <td>{{ val.dob }}</td>
+                        <td>{{ val.id_number|default:"" }}</td>
+                        <td>{{ val.house_number|default:"" }}</td>
+                        <td>
+                            D: {{val.village.ward.district.name}}<br />
+                            W: {{val.village.ward.name}}<br />
+                            V: {{ val.village.name }}
+                        </td>
+                        <td>
+                            <a href="#" title="Info" class="btn btn-xss">
+                                <i class="fa-regular fa-eye"></i>
+                            </a>
+
+                            <a href="#" title="Edit" class="btn btn-xss">
+                                <i class="fa-regular fa-pen-to-square text-secondary"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--./container -->
+
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

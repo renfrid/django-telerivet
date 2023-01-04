@@ -1,14 +1,30 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 # Create your models here.
+class Keyword(models.Model):
+    title = models.CharField(max_length=50, blank=False, null=False)
+
+    class Meta:
+        db_table = 'dt_keywords'
+        verbose_name_plural = 'Keyword'
+
+    def __str__(self):
+        return self.title
+
+
 class Menu(models.Model):
+    keyword     =  models.ForeignKey(Keyword, blank=True, null=True, on_delete=models.CASCADE)
+    sequence    =  models.IntegerField(blank=True, null=True, default=0)
+    step        =  models.CharField(max_length=10, blank=True, null=True)
     title       =  models.TextField(blank=False, null=False)
     flag        =  models.CharField(max_length=50, blank=False, null=False)
     label       =  models.CharField(max_length=50, blank=True, null=True)
     pull        =  models.IntegerField(default=0, null=False)
-    pull_url    =  models.URLField(blank=True, null=True)
-    post_url    =  models.URLField(blank=True, null=True)
+    url         =  models.CharField(max_length=50, blank=True, null=True)
+    action      =  models.CharField(max_length=20, blank=True, null=True)
+    created_by  =  models.ForeignKey(User, on_delete=models.CASCADE)
+    updated_by  =  models.ForeignKey(User, related_name="updated", blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'dt_menus'

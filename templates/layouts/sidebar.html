@@ -21,7 +21,7 @@
                     <span class="badge bg-success-soft text-success ms-auto">2 New!</span>
                 </a>
                 <!-- Sidenav Menu Heading (Core)-->
-                <div class="sidenav-menu-heading">OHIS DATA</div>
+                <div class="sidenav-menu-heading">JINADI DATA</div>
                 
                 <!-- Sidenav Accordion (Dashboard)-->
                 <a class="nav-link" href="{% url 'dashboard' %}" >
@@ -32,22 +32,16 @@
                 <!-- Sidenav Heading (Addons)-->
                 <!-- <div class="sidenav-menu-heading">Surveillance</div> -->
                 <!-- Sidenav Link (Charts)-->
-                <a class="nav-link" href="{% url 'surveillance:animal' %}">
-                    <div class="nav-link-icon"><i class="fa-solid fa-dog"></i></div>
-                    Animal
+                <a class="nav-link" href="{% url 'citizen:lists' %}">
+                    <div class="nav-link-icon"><i class="fa-solid fa-people-arrows"></i></div>
+                    Citizens
                 </a>
 
-                <!-- Sidenav Link (Tables)-->
-                <a class="nav-link" href="{% url 'surveillance:human' %}">
+                <a class="nav-link" href="{% url 'leaders:lists' %}">
                     <div class="nav-link-icon"><i class="fa-solid fa-people-group"></i></div>
-                    Human
+                    Leaders
                 </a>
 
-                <!-- Sidenav Link (Tables)-->
-                <a class="nav-link" href="#">
-                    <div class="nav-link-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-                    Research
-                </a>
 
                 <!-- Sidenav Accordion (Components)-->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseComponents" aria-expanded="false" aria-controls="collapseComponents">
@@ -57,11 +51,23 @@
                 </a>
                 <div class="collapse" id="collapseComponents" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">Disease</a>
-                        <a class="nav-link" href="#">Species</a>
-                        <a class="nav-link" href="#">Age Groups</a>                        
+                        <a class="nav-link" href="{% url 'setup:menu' %}">Menu</a>
+                        <a class="nav-link" href="{% url 'setup:menu-links' %}">Menu Links</a>                       
                     </nav>
                 </div>
+
+                <!-- Sidenav Accordion (Components)-->
+                <!-- <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLocation" aria-expanded="false" aria-controls="collapseLocation">
+                    <div class="nav-link-icon"><i class="fa-solid fa-map"></i></div>
+                    Location
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseLocation" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{% url 'setup:menu' %}">Wards</a>
+                        <a class="nav-link" href="{% url 'setup:menu-links' %}">Villages</a>                       
+                    </nav>
+                </div> -->
             </div>
         </div>
         <!-- Sidenav Footer-->

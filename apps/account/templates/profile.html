@@ -1,0 +1,113 @@
+{% extends 'layouts/app-with-nav.html' %}
+{% load static %}
+{% block title %} My Profile {% endblock %}
+
+{% block content %}
+<section class="our-dashbord dashbord">
+    <div class="container-fluid">
+        <div class="row">
+            {% include 'layouts/sidebar.html'%}
+
+            <!--./contents -->
+            <div class="col-sm-10 col-lg-10 col-xl-10">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-12">
+                        <nav class="breadcrumb_widgets" aria-label="breadcrumb mb30">
+                            <h4 class="title float-left text-uppercase">My Profile</h4>
+                            <ol class="breadcrumb float-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <!--./col -->
+
+                    <div class="col-lg-12 col-md-12 col-12">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <!-- Account details card-->
+                                <div class="card mb-4">
+                                    <div class="card-header text-xss text-uppercase font-weight-600">
+                                        Personal Information
+                                    </div>
+                                    <div class="card-body">
+                                        {% for message in messages %}
+                                        <div class="alert {{ message.tags }} mb-4 text-center" role="alert">
+                                            <strong>{{ message }}</strong>
+                                        </div>
+                                        {% endfor %}
+
+                                        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+                                            {% csrf_token %}
+
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="firstname">First name <span
+                                                                class="danger">*</span></label>
+                                                        <input type="text" name="first_name" value="{{user.first_name}}"
+                                                            class="form-control" required/>
+
+                                                    </div>
+                                                </div>
+                                                <!--./col -->
+
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="tinno">Last name <span
+                                                                class="danger">*</span></label>
+                                                        <input type="text" name="last_name" value="{{user.last_name}}"
+                                                            class="form-control" required/>
+                                                    </div>
+                                                </div>
+                                                <!--./col -->
+
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="email">Email <span class="danger">*</span></label>
+                                                        <input type="email" name="email" value="{{user.email}}"
+                                                            class="form-control" required/>
+                                                    </div>
+                                                </div>
+                                                <!--./col -->
+                                            </div>
+                                            <!--./row -->
+
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="float-right">
+                                                        <div class="form-group">
+                                                            <a href="#"
+                                                                class="btn btn-outline-danger text-medium">Cancel</a>
+                                                            <button type="submit"
+                                                                class="btn btn-secondary text-medium">Save <i
+                                                                    class="fa fa-chevron-circle-right"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--./col-lg-12 -->
+                                            </div>
+                                            <!--./row -->
+                                        </form>
+
+                                    </div>
+                                    <!--./card-body -->
+                                </div>
+                                <!--./card -->
+                            </div>
+                            <!--./col -->
+                        </div>
+                        <!--./row -->
+
+                    </div>
+                    <!--./col -->
+                </div>
+                <!--./row -->
+            </div>
+            <!--./col -->
+        </div>
+        <!--./row -->
+    </div>
+    <!--./container-fluid -->
+</section>
+{% endblock content %}

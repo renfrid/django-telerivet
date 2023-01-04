@@ -1,0 +1,6 @@
+<select name="village_id" id="village_id" class="form-control">
+    <option value="">Select</option>
+    {% for village in villages %}
+        <option value="{{ village.id }}">{{ village.name }}</option>
+    {% endfor %}
+</select>

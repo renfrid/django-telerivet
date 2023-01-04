@@ -18,9 +18,11 @@ class Region(models.Model):
 
 #districts
 class District(models.Model):
+    view_id   =  models.CharField(max_length=10, blank = True, null = True)
     name      = models.CharField(max_length=30, blank = False, null = False)
     region    = models.ForeignKey(Region, related_name='region', on_delete=models.DO_NOTHING)
     post_code = models.CharField(max_length=4, blank = True, null = True)
+    phone     = models.CharField(max_length=20, blank = True, null = True)
 
     class Meta: 
         db_table = 'dt_districts'
@@ -33,6 +35,7 @@ class District(models.Model):
 
 #wards
 class Ward(models.Model):
+    view_id   =  models.CharField(max_length=10, blank = True, null = True)
     name      = models.CharField(max_length=30,blank=False, null=False)
     district  = models.ForeignKey(District, related_name='district',on_delete=models.DO_NOTHING) 
     post_code = models.CharField(max_length=4, blank = True, null = True)     
@@ -48,6 +51,7 @@ class Ward(models.Model):
 
 
 class Village(models.Model):
+    view_id      =  models.CharField(max_length=10, blank = True, null = True)
     name         = models.CharField(max_length=30, null=False, blank=False)
     ward         = models.ForeignKey(Ward, related_name='village', on_delete=models.DO_NOTHING)
     post_code    = models.CharField(max_length=6, blank = True, null = True)
@@ -63,6 +67,7 @@ class Village(models.Model):
 
 
 class Neighborhood(models.Model):
+    view_id      =  models.CharField(max_length=10, blank = True, null = True)
     name         = models.CharField(max_length=30, null=False, blank=False)
     village      = models.ForeignKey(Village, related_name='neighborhood', on_delete=models.DO_NOTHING)
     post_code    = models.CharField(max_length=6, blank = True, null = True)

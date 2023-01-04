@@ -124,7 +124,7 @@ Colors
 }
 
 .btn-xss {
-  padding: .12rem .36rem;
+  padding: .16rem .24rem;
   font-size: .800rem;
   background: rgba(25, 103, 210, 0.07);
   line-height: 1.8;
@@ -338,25 +338,21 @@ table.table {
 }
 
 table.table th {
-  font-family: 'Jost', sans-serif !important;
   font-size: 13px;
   font-weight: 600;
   text-align: left;
   color: #212121;
   padding: 10px !important;
-  background: #ECEFF1;
-  border-bottom: 1px solid #ECEFF1;
-  /* border: 1px solid #eee; */
+  border-bottom: 0;
 }
 
 table.table td {
-  font-family: 'Jost', sans-serif !important;
   font-size: 13px;
   font-weight: 400;
   background: #FFF;
   color: #212121;
-  vertical-align: middle;
-  border-bottom: 1px solid #E3E3E3;
+  vertical-align: top;
+  border-bottom: 0;
   padding: 12px !important;
 }
 

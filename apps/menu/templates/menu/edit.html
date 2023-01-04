@@ -1,0 +1,113 @@
+{% extends 'layouts/app-with-nav.html' %}
+{% load static %}
+{% load crispy_forms_field %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% block title %} Create New Thread {% endblock %}
+
+{% block content %}
+
+<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+    <div class="container-xl px-4">
+        <div class="page-header-content">
+            <div class="row align-items-center justify-content-between pt-3">
+                <div class="col-auto mb-3">
+                    <h1 class="page-header-title">
+                        <div class="page-header-icon"><i data-feather="users"></i></div>
+                        Threads
+                    </h1>
+                </div>
+                <div class="col-12 col-xl-auto mb-3">
+                    <a class="btn btn-sm btn-light text-primary" href="{% url 'setup:menu' %}">
+                        <i class="me-1" data-feather="arrow-left"></i>
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main page content-->
+<div class="container-xl px-4 mt-4">
+    <div class="card mb-4">
+        <div class="card-header">Update Thread</div>
+        <div class="card-body">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row gx-3 mb-3">
+                    <div class="col-md-2">
+                        {{ form.step|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+
+                    <div class="col-md-4">
+                        {{ form.keyword|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+                </div>
+                <!--./row -->
+
+                <div class="row gx-3 mb-3">
+                    <div class="col-md-12">
+                        {{ form.title|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+                </div>
+                <!--./row -->
+
+                <div class="row gx-3 mb-3">
+                    <div class="col-md-3">
+                        {{ form.flag|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+                
+                    <div class="col-md-3">
+                        {{ form.label|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+
+                    <div class="col-md-2">
+                        {{ form.pull|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+
+                    <div class="col-md-4">
+                        {{ form.url|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-12 -->
+                </div>
+                <!--./row -->
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="text-sm-end">
+                            <a href="{% url 'setup:menu' %}" class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
+                            <button class="btn btn-secondary text-medium btn-sm" type="submit">
+                                Update
+                            </button>
+                        </div>
+                        <!--./float-right -->
+                    </div>
+                    <!--./col -->
+                </div>
+                <!--./row -->
+            </form>
+        </div>
+    </div>
+</div>
+<!--./container -->
+
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

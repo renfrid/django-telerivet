@@ -1,0 +1,6 @@
+<select name="ward_id" id="ward_id" class="form-control">
+    <option value="">Select</option>
+    {% for ward in wards %}
+        <option value="{{ ward.id }}">{{ ward.name }}</option>
+    {% endfor %}
+</select>
