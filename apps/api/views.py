@@ -19,13 +19,13 @@ def webhook(request):
 
     # return HttpResponse('executed')
 
-    if request.POST.get('secret') != webhook_secret:
-        return HttpResponse("Invalid webhook secret", 'text/plain', 403)
+    # if request.POST.get('secret') != webhook_secret:
+    #     return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
-    if request.POST.get('event') == 'incoming_message':
-        key = request.POST.get('content')
-        from_number = request.POST.get('from_number')
-        phone_id = request.POST.get('phone_id')
+    if request.GET.get('event') == 'incoming_message':
+        key = request.GET.get('content')
+        from_number = request.GET.get('from_number')
+        phone_id = request.GET.get('phone_id')
 
         print("key => " + key)
         print("from number => " + from_number)
