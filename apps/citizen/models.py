@@ -18,10 +18,11 @@ class Citizen(models.Model):
     )
 
     STATUS_OPTIONS = (
+        ('PENDING', 'PENDING'),
         ('UNVERIFIED', 'UNVERIFIED'),
         ('VERIFIED', 'VERIFIED'),
         ('PARTIAL', 'PARTIAL'),
-        ('COMPLETE', 'COMPLETE'),
+        ('COMPLETED', 'COMPLETED'),
         ('VALID', 'VALID'),
         ('INVALID', 'INVALID'),
     )
@@ -37,6 +38,7 @@ class Citizen(models.Model):
     ward              = models.ForeignKey(Ward, related_name="citizen_ward", on_delete=models.DO_NOTHING, blank=True, null=True)
     village           = models.ForeignKey(Village, related_name="citizen_village", on_delete=models.DO_NOTHING, blank=True, null=True)
     neighborhood      = models.ForeignKey(Neighborhood, related_name="citizen_neighborhood", on_delete=models.DO_NOTHING, blank=True, null=True)
+    hamlet            = models.CharField(max_length=150, blank=True, null=True)
     physical_address  = models.TextField(null=True, blank=True)
     work              = models.CharField(max_length=50, blank=True, null=True)
     be_jembe          = models.IntegerField(null=True, blank=True, default=0)
@@ -45,7 +47,7 @@ class Citizen(models.Model):
     working_shina     = models.CharField(max_length=50, null=True, blank=True)
     password          = models.CharField(max_length=20, blank=True, null=True)
     step              = models.IntegerField(default=1, blank=True, null=True)
-    status            = models.CharField(max_length=20, choices=STATUS_OPTIONS,default='UNVERIFIED', blank=True, null=True)
+    status            = models.CharField(max_length=20, choices=STATUS_OPTIONS,default='PENDING', blank=True, null=True)
     is_active         = models.IntegerField(default=0, blank=True, null=True)
     created_at        = models.DateTimeField(auto_now_add=True)
     updated_by        = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='citizen_user', blank=True, null=True)
@@ -59,3 +61,21 @@ class Citizen(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class Token(models.Model):
+    citizen = models.ForeignKey(Citizen, related_name="citizen", on_delete=models.DO_NOTHING, blank=False, null=False)
+    client = models.ForeignKey(Citizen, related_name="client", on_delete=models.DO_NOTHING, blank=False, null=False)
+    otp = models.IntegerField()
+    created_at   = models.DateTimeField(auto_now_add=True)
+    used_at = models.DateTimeField(auto_now=True, null=True)
+    status = models.IntegerField(default=0, blank=True, null=True)   
+
+    class Meta:
+        db_table     = 'dt_tokens'
+        managed      = True
+        verbose_name = 'Token'
+        verbose_name_plural = 'Tokens'
+
+    def __str__(self):
+        return str(self.otp)     

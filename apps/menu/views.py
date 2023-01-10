@@ -141,7 +141,7 @@ class MenuLinkListView(generic.ListView):
         context = super(MenuLinkListView, self).get_context_data(**kwargs)
         context['title'] = "Menu Links"
         context['keyword'] = Keyword.objects.all()
-        context['menu'] = Menu.objects.filter(keyword_id=1).order_by('step')
+        context['menu'] = Menu.objects.filter(keyword_id=3).order_by('step')
 
         return context
 

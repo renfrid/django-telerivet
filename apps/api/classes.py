@@ -14,8 +14,10 @@ import telerivet
 
 
 class TelerivetWrapper:
-    BASE_URL   = "http://jinadi.happen.co.tz/"
+    BASE_URL   = "http://127.0.0.1:8000/"
+    # BASE_URL   = "http://jinadi.happen.co.tz/"
     API_TOKEN  = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
+    # API_KEY = 'ZaCNa_cgefsjQ3eDLQ8JH33RvMuQ1qQmTT2h'
     API_KEY = 'c7fAkAuMy8a6aUZQWyNNyYXSutXuszcV'
     PROJECT_ID = 'PJ592866ba523f191f'
 
@@ -31,48 +33,48 @@ class TelerivetWrapper:
         """ Init First Menu """
 
         """args"""
-        phone  = kwargs['phone']
-        key    = kwargs['key']
+        phone        = kwargs['phone']
+        key          = kwargs['key']
+        designation  = kwargs['designation']
 
         """menu"""
-        if key == 'JIHAKIKI':
-            menu = Menu.objects.get(flag="Jihakiki_Jina")
-        elif key == 'MTENDAJI':
+        if key.upper() == 'MTENDAJI':
             menu = Menu.objects.get(flag="Mtendaji_Name") 
+        elif key.upper() == 'MJUMBE':
+            menu = Menu.objects.get(flag="Mjumbe_Name")
+        elif key.upper() == 'MWANANCHI':
+            menu = Menu.objects.get(flag='Mwanachi_Name')    
 
         """random code"""
-        random_code = ''.join(random.choices(string.ascii_uppercase, k=12))
+        uuid = ''.join(random.choices(string.ascii_uppercase, k=12))
 
         """Create menu session"""
-        session = MenuSession()   
-        session.code = random_code
-        session.menu_id = menu.id
-        session.phone = phone
-        session.save()
+        session_id = self.create_menu_session(phone=phone, menu_id=menu.id, uuid=uuid)
 
-        message = self.process_menu(menu_id=menu.id, phone=phone)
+        message = self.process_menu(menu.id, phone, uuid, designation)
 
         return message
 
     def call_registration_menu(self, **kwargs):
         """Registration Menu"""
+
+        """args"""
         phone = kwargs['phone']
         key   = kwargs['key']
 
         """random code"""
-        random_code = ''.join(random.choices(string.ascii_uppercase, k=12))
+        uuid = ''.join(random.choices(string.ascii_uppercase, k=12))
 
         """menu"""
-        if key.upper() == 'JIHAKIKI':
-            menu = Menu.objects.get(flag="Jihakiki_Jina")
-            designation = "MWANANCHI"
-        elif key.upper() == 'MTENDAJI':
+        if key.upper() == 'MTENDAJI':
             menu = Menu.objects.get(flag="Mtendaji_Name")
             designation = "MTENDAJI"
-
-        menu_id = 16
-        if menu:
-            menu_id = menu.id
+        elif key == 'MJUMBE':
+            menu = Menu.objects.get(flag="Mjumbe_Name")
+            designation = "MJUMBE"
+        elif key.upper() == 'MWANANCHI':
+            menu = Menu.objects.get(flag='Mwanachi_Name')
+            designation = "MWANANCHI"
 
         """Create new temporary data"""
         citizen = Citizen()
@@ -81,14 +83,10 @@ class TelerivetWrapper:
         citizen.save()
 
         """create new session"""
-        session = MenuSession()   
-        session.code = random_code
-        session.menu_id = menu_id
-        session.phone = phone
-        session.save()
+        session_id = self.create_menu_session(phone=phone, menu_id=menu.id, uuid=uuid)
 
         """process menu"""
-        message = self.process_menu(menu_id, phone)
+        message = self.process_menu(menu.id, phone, uuid, designation)
 
         return message
 
@@ -155,10 +153,13 @@ class TelerivetWrapper:
 
     def next_menu(self, **kwargs):
         """Triggering Next Menu"""
-        phone   = kwargs['phone']
-        uuid    = kwargs['uuid']
-        menu_id = kwargs['menu_id']
-        key     = kwargs['key']
+
+        """args"""
+        phone       = kwargs['phone']
+        uuid        = kwargs['uuid']
+        menu_id     = kwargs['menu_id']
+        key         = kwargs['key']
+        designation = kwargs['designation']
 
         """action"""
         action = None
@@ -173,14 +174,10 @@ class TelerivetWrapper:
 
             if(menu_link):
                 """create menu session"""
-                session = MenuSession()
-                session.code = uuid
-                session.menu_id = menu_link[0].link_id
-                session.phone = phone
-                session.save()
+                session_id = self.create_menu_session(phone=phone,menu_id=menu_link[0].link_id,uuid=uuid)
 
                 """process menu"""
-                message = self.process_menu(menu_link[0].link_id, phone)            
+                message = self.process_menu(menu_link[0].link_id, phone, uuid, designation)            
             else:
                 """message"""
                 message = "Invalid input"
@@ -189,14 +186,12 @@ class TelerivetWrapper:
 
             if(menu_link):
                 """create menu session"""
-                session = MenuSession()
-                session.code = uuid
-                session.menu_id = menu_link[0].link_id
-                session.phone = phone    
-                session.save()
+                session_id = self.create_menu_session(phone=phone,menu_id=menu_link[0].link_id,uuid=uuid)
 
                 """process menu"""
-                message = self.process_menu(menu_link[0].link_id, phone)
+                message = self.process_menu(menu_link[0].link_id, phone, uuid, designation)
+
+                """menu action"""
                 menu = Menu.objects.get(pk=menu_link[0].link_id)
 
                 if menu.action is not None:
@@ -207,21 +202,27 @@ class TelerivetWrapper:
 
         return JsonResponse({'status': 'success', 'message': message, 'action': action})
 
-    def process_menu(self, menu_id, phone):
+    def process_menu(self, menu_id, phone, uuid, designation):
         """Process Menu"""
         message = ""
 
         menu = Menu.objects.get(pk=menu_id)
         message = menu.title
 
-        if menu.flag == 'Jihakiki_Verify_ID':
-            menu_session = MenuSession.objects.filter(menu_id=5, phone=phone).last()
+        if menu.flag == 'Mwananchi_Verify_ID':
+            menu_session = MenuSession.objects.filter(flag="Mwananchi_ID_Number", phone=phone).last()
 
             if menu_session:
                 message = message.replace("ID_Number", menu_session.values)
 
         if menu.flag == 'Mtendaji_Verify_ID':
-            menu_session = MenuSession.objects.filter(menu_id=26, phone=phone).last()
+            menu_session = MenuSession.objects.filter(flag="Mtendaji_ID_Number", phone=phone).last()
+
+            if menu_session:
+                message = message.replace("ID_Number", menu_session.values)
+
+        if menu.flag == 'Mjumbe_Verify_ID':
+            menu_session = MenuSession.objects.filter(flag='Mjumbe_ID_Number', phone=phone).last()
 
             if menu_session:
                 message = message.replace("ID_Number", menu_session.values)
@@ -231,7 +232,7 @@ class TelerivetWrapper:
             URL = self.BASE_URL + menu.url
 
             """response"""
-            response = requests.get(URL)
+            response = requests.get(URL, params={"message_id": uuid, "designation": designation})
 
             sub_message = ""
             for data in response.json()['response']:
@@ -251,8 +252,32 @@ class TelerivetWrapper:
         return message 
 
 
+    def create_menu_session(self, **kwargs):
+        """create menu session""" 
+
+        """args""" 
+        phone   = kwargs['phone']
+        menu_id = kwargs['menu_id']
+        uuid    = kwargs['uuid']
+
+        """query menu"""
+        menu  = Menu.objects.get(pk=menu_id)
+
+        """create menu session"""
+        session = MenuSession() 
+        session.phone = phone  
+        session.code = uuid
+        session.menu_id = menu.id
+        session.flag = menu.flag
+        session.save()
+
+        return session.id
+
+
+
     def send_message(self, **kwargs):
         """Send message to telerivet"""
+        """args"""
         sender  = kwargs["sender"]
         message = kwargs["message"]
 
@@ -270,6 +295,8 @@ class TelerivetWrapper:
 
     def process_data(self, **kwargs):
         """Process data for processing"""
+
+        """args"""
         uuid  = kwargs["uuid"]
 
         """menu sessions"""

@@ -41,10 +41,10 @@ class RegistrationWrapper:
 
         if designation == 'MTENDAJI':
             label = 'VEO'
-        elif designation == 'MWANANCHI':
-            label = "MNC"
         elif designation == 'MJUMBE':
-            label = 'MJB'    
+            label = 'MJB' 
+        elif designation == 'MWANANCHI':
+            label = "MNC"   
 
         """concatenate"""
         unique_id = label + "-" + postcode + "-" + str(randno)   

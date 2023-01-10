@@ -61,7 +61,7 @@ class MenuLink(models.Model):
 class MenuSession(models.Model):
     code        =  models.CharField(max_length=100, blank=True, null=True)
     phone       =  models.CharField(max_length=100, blank=True, null=True)
-    message_id  =  models.CharField(max_length=100, blank=True, null=True)
+    flag        =  models.CharField(max_length=100, blank=True, null=True)
     channel     =  models.CharField(max_length=100, blank=False, null=False, default='whatsapp')  
     menu        =  models.ForeignKey(Menu, on_delete=models.CASCADE)
     values      =  models.TextField(blank=True, null=True)
