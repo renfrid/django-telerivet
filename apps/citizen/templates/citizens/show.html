@@ -1,0 +1,237 @@
+{% extends 'layouts/app-with-nav.html' %}
+{% load static %}
+{% load crispy_forms_field %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% block title %} Citizen Information {% endblock %}
+
+{% block content %}
+
+<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
+    <div class="container-xl px-4">
+        <div class="page-header-content">
+            <div class="row align-items-center justify-content-between pt-3">
+                <div class="col-auto mb-3">
+                    <h1 class="page-header-title">
+                        <div class="page-header-icon"><i data-feather="users"></i></div>
+                        Citizens
+                    </h1>
+                </div>
+                <div class="col-12 col-xl-auto mb-3">
+                    <a class="btn btn-sm btn-light text-primary" href="{% url 'citizens:lists' %}">
+                        <i class="me-1" data-feather="arrow-left"></i>
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main page content-->
+<div class="container-xl px-4 mt-4">
+    <div class="row">
+        <div class="col-xl-12 col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">{{ citizen.name }} : {{ citizen.unique_id }}</div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row gx-3 mb-3">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-4">
+                                <div class="control-group">
+                                    <label class="control-label">Status</label>
+                                    <select name="status" id="status" class="form-control">
+                                        <option value="{{ citizen.status }}">{{ citizen.status }}</option>
+                                        <option value="PENDING">PENDING</option>
+                                        <option value="UNVERIFIED">UNVERIFIED</option>
+                                        <option value="VERIFIED">VERIFIED</option>
+                                        <option value="COMPLETED">COMPLETED</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-4">
+                                <div class="control-group">
+                                    <label class="control-label ">Is Active</label>
+                                    <select name="is_active" id="is_active" class="form-control">
+                                        <option value="{{ citizen.is_active}}">{{ citizen.is_active|yesno:"Yes,No"}}
+                                        </option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-4">
+                                <div class="control-group">
+                                    <label class="control-label ">Be Jembe</label>
+                                    <select name="be_jembe" id="be_jembe" class="form-control">
+                                        <option value="{{ citizen.be_jembe}}">{{ citizen.be_jembe|yesno:"Yes,No"}}
+                                        </option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                <div class="text-sm-end">
+                                    <a href="{% url 'citizens:lists' %}"
+                                        class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
+                                    <button class="btn btn-secondary text-medium btn-sm" type="submit">
+                                        Update
+                                    </button>
+                                </div>
+                                <!--./float-right -->
+                            </div>
+                            <!--./col -->
+                        </div>
+                        <!--./row -->
+                    </form>
+
+                    <div class="mt-4">
+                        <table class="table table-stripped table-bordered">
+                            <tr>
+                                <td colspan="4" class="font-weight-600">Citizen Information</td>
+                            </tr>
+                            <tr>
+                                <th width=25%>Name</th>
+                                <td>
+                                    {{ citizen.name }}
+                                </td>
+
+                                <th>Designation</th>
+                                <td>
+                                    {{ citizen.designation }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>Citizen Unique ID</th>
+                                <td>
+                                    {{ citizen.unique_id }}
+                                </td>
+
+                                <th width=25%>Phone</th>
+                                <td>
+                                    {{ citizen.phone }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th width=25%>ID Type</th>
+                                <td>
+                                    {{ citizen.id_type }}
+                                </td>
+
+                                <th>ID Number</th>
+                                <td>
+                                    {{ citizen.id_number }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>Occupation</th>
+                                <td>
+                                    {{ citizen.work }}
+                                </td>
+                            
+                                <th width=25%>Status</th>
+                                <td>
+                                    {% if citizen.status == 'COMPLETED' %}
+                                        <label class="badge bg-info">COMPLETE REGISTRATION</label>
+                                    {% elif citizen.status == 'UNVERIFIED' %}
+                                        <label class="badge bg-danger">UNVERIFIED</label>
+                                    {% elif citizen.status == 'VERIFIED' %}
+                                        <label class="badge bg-success">VERIFIED</label>
+                                    {% elif citizen.status == 'PENDING' %}
+                                        <label class="badge bg-warning">PENDING</label>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th width=25%>Jembe</th>
+                                <td>
+                                    {{ citizen.be_jembe|yesno:"Yes,No" }}
+                                </td>
+
+                                <th>Is Active</th>
+                                <td>
+                                    {% if citizen.is_active == 1 %}
+                                        <label class="badge bg-success">YES</label>
+                                    {% elif citizen.is_active == 0 %}
+                                        <label class="badge bg-danger">NO</label>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="4" class="font-weight-600">Location</td>
+                            </tr>
+
+                            <tr>
+                                <th width=25%>Region</th>
+                                <td>
+                                    {{ citizen.ward.district.region.name }}
+                                </td>
+
+                                <th>District</th>
+                                <td>
+                                    {{ citizen.ward.district.name }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th width=25%>Ward</th>
+                                <td>
+                                    {{ citizen.ward.name }}
+                                </td>
+
+                                <th>Village</th>
+                                <td>
+                                    {{ citizen.village.name }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th width=25%>Neighborhood</th>
+                                <td>
+                                    {{ citizen.hamlet }}
+                                </td>
+
+                                <th>House Number</th>
+                                <td>
+                                    {{ citizen.physical_address }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!--./container -->
+
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

@@ -2,18 +2,19 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
-from apps.account.models import Profile
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib import messages
 from .forms import LeaderForm
+from apps.citizen.models import Citizen
+from apps.api.registration import RegistrationWrapper
 
 
 class LeaderListView(generic.ListView):
-    model = Profile
-    context_object_name = 'leader'
+    model = Citizen
+    context_object_name = 'leaders'
     template_name = 'leaders/lists.html'
     paginate_by = 50
 
@@ -28,15 +29,45 @@ class LeaderListView(generic.ListView):
         return context
 
     def get_queryset(self, *args, **kwargs):
-        leaders = Profile.objects.filter(Q(designation=2) | Q(designation=3) | Q(designation=4)).order_by('id')
+        leaders = Citizen.objects.filter(Q(designation="MTENDAJI_KATA") | 
+            Q(designation="MTENDAJI") | 
+            Q(designation="MWENYEKITI") | 
+            Q(designation="MJUMBE")).order_by('id')
 
         return leaders
 
 
 class LeaderDetailView(generic.DetailView):
     """View to update a details"""
+    model = Citizen
+    context_object_name = 'leader'
+    template_name = 'leaders/show.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LeaderDetailView, self).dispatch( *args, **kwargs) 
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(LeaderDetailView, self).get_context_data(**kwargs)
+        context['title'] = "Leaders"
+
+        leader = Citizen.objects.get(id=self.kwargs['pk'])
+        context['leader'] = leader
+
+        return context
+
+    def post(self, request, *args, **kwargs):  
+        qry_leader = Citizen.objects.get(id=kwargs['pk'] )
+        qry_leader.status = request.POST.get('status') 
+        qry_leader.is_active = request.POST.get('is_active') 
+        qry_leader.save()
+
+        messages.success(request, 'Leader status updated!')
+        return HttpResponseRedirect(reverse_lazy('leaders:show', kwargs={'pk': kwargs['pk'] }))
+
 
 class LeaderCreateView(generic.CreateView):
+    """Register new leader"""
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(LeaderCreateView, self).dispatch( *args, **kwargs)
@@ -47,25 +78,56 @@ class LeaderCreateView(generic.CreateView):
 
     def post(self, request, *args, **kwargs):
         form = LeaderForm(request.POST)
-        print("reaches here")
+
+        """registration wrapper"""
+        formating = RegistrationWrapper()
+
         if form.is_valid():
-            print("reaches here 1")
-            print(form)
+            designation = request.POST.get('designation')
 
-            # dt_menu = form.save(commit=False)
-            # dt_menu.created_by = request.user
-            # dt_menu.save()
+            """save POST data"""
+            dt_leader = form.save(commit=False)
+            dt_leader.created_by = request.user
+            dt_leader.is_active = 1
+            dt_leader.status = 'VERIFIED'
+            dt_leader.password = formating.generate_pin(pin_size=4)
+            dt_leader.unique_id = formating.generate_unique_id(designation=designation)
+            dt_leader.phone = formating.format_phone(phone=request.POST.get('phone'))
+            dt_leader.save()
 
-            #message
             messages.success(request, 'Leader registered!')
-
-            #redirect
-            return HttpResponseRedirect(reverse_lazy('leader:lists'))
+            return HttpResponseRedirect(reverse_lazy('leaders:lists'))
         return render(request, 'leaders/create.html', {'form': form})  
 
 
-class MenuUpdateView(generic.UpdateView):
-    """View to update a film"""
+class LeaderUpdateView(generic.UpdateView):
+    """Update citizen details"""
+    model = Citizen
+    context_object_name = 'leader'
+    form_class = LeaderForm
+    template_name = 'leaders/edit.html'
 
-class MenuDeleteView(generic.DeleteView):
-    """View to delete a film"""  
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LeaderUpdateView, self).dispatch( *args, **kwargs)
+
+    def form_valid(self, form):
+        """registration wrapper"""
+        formating = RegistrationWrapper()
+
+        dt_leader = form.save(commit=False)
+        dt_leader.updated_by = self.request.user
+        dt_leader.phone = formating.format_phone(phone=self.request.POST.get('phone'))
+        dt_leader.save()
+
+        messages.success(self.request, 'Leader information updated!')
+        return HttpResponseRedirect(reverse_lazy('leaders:lists')) 
+
+class LeaderDeleteView(generic.DeleteView):
+    """View to delete a Citizen""" 
+    model = Citizen
+    template_name = "leaders/confirm_delete.html"
+
+    def get_success_url(self):
+        messages.success(self.request, "Leader deleted successfully")
+        return reverse_lazy('leaders:lists') 

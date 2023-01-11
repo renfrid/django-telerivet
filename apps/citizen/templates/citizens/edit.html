@@ -3,7 +3,7 @@
 {% load crispy_forms_field %}
 {% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
-{% block title %} Register new leader {% endblock %}
+{% block title %} Update citizen {% endblock %}
 
 {% block content %}
 
@@ -14,11 +14,11 @@
                 <div class="col-auto mb-3">
                     <h1 class="page-header-title">
                         <div class="page-header-icon"><i data-feather="users"></i></div>
-                        Leaders
+                        Citizens
                     </h1>
                 </div>
                 <div class="col-12 col-xl-auto mb-3">
-                    <a class="btn btn-sm btn-light text-primary" href="{% url 'leaders:lists' %}">
+                    <a class="btn btn-sm btn-light text-primary" href="{% url 'citizens:lists' %}">
                         <i class="me-1" data-feather="arrow-left"></i>
                         Back to List
                     </a>
@@ -31,7 +31,7 @@
 <!-- Main page content-->
 <div class="container-xl px-4 mt-4">
     <div class="card mb-4">
-        <div class="card-header">Register New Leader</div>
+        <div class="card-header">Update citizen</div>
         <div class="card-body">
             {% if messages %}
             {% for message in messages %}
@@ -57,18 +57,6 @@
                     <!--./col-lg-6 -->
 
                     <div class="col-md-3">
-                        {{ form.designation|as_crispy_field }}
-                    </div>
-                    <!--./col-lg-12 -->
-
-                    <div class="col-md-3">
-                        {{ form.phone|as_crispy_field }}
-                    </div>
-                    <!--./col-lg-6 -->
-                </div>
-
-                <div class="row gx-3 mb-3">
-                    <div class="col-md-3">
                         {{ form.dob|as_crispy_field }}
                     </div>
                     <!--./col-lg-12 -->
@@ -77,7 +65,10 @@
                         {{ form.gender|as_crispy_field }}
                     </div>
                     <!--./col-lg-12 -->
+                </div>
+                <!--./row -->
 
+                <div class="row gx-3 mb-3">
                     <div class="col-md-3">
                         {{ form.id_type|as_crispy_field }}
                     </div>
@@ -87,11 +78,13 @@
                         {{ form.id_number|as_crispy_field }}
                     </div>
                     <!--./col-lg-6 -->
-                </div>
-                <!--./row -->
 
-                <div class="row gx-3 mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-6 -->
+
+                    <div class="col-md-3">
                         {{ form.work|as_crispy_field }}
                     </div>
                     <!--./col-lg-6 -->
@@ -100,24 +93,29 @@
 
                 <div class="row gx-3 mt-4 mb-3">
                     <div class="col-md-12">
-                        <h5 class="">Working Location</h5>
+                        <h5 class="">Physical Location</h5>
                         <hr />
                     </div>
                 </div>
 
                 <div class="row gx-3 mb-3">
                     <div class="col-md-3">
-                        {{ form.working_ward|as_crispy_field }}
+                        {{ form.ward|as_crispy_field }}
                     </div>
                     <!--./col-lg-6 -->
 
                     <div class="col-md-3">
-                        {{ form.working_village|as_crispy_field }}
+                        {{ form.village|as_crispy_field }}
                     </div>
                     <!--./col-lg-6 -->
-                
-                    <div class="col-md-6">
-                        {{ form.working_shina|as_crispy_field }}
+
+                    <div class="col-md-3">
+                        {{ form.hamlet|as_crispy_field }}
+                    </div>
+                    <!--./col-lg-6 -->
+
+                    <div class="col-md-3">
+                        {{ form.physical_address|as_crispy_field }}
                     </div>
                     <!--./col-lg-6 -->
                 </div>
@@ -126,9 +124,9 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="text-sm-end">
-                            <a href="{% url 'leaders:lists' %}" class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
+                            <a href="{% url 'citizens:lists' %}" class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
                             <button class="btn btn-secondary text-medium btn-sm" type="submit">
-                                Submit
+                                Update
                             </button>
                         </div>
                         <!--./float-right -->

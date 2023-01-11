@@ -5,12 +5,10 @@ app_name = 'leaders'
 
 urlpatterns = [
     path('lists', views.LeaderListView.as_view(), name='lists'),
-    # path('menu/<int:pk>/show', views.MenuDetailView.as_view(), name='menu-detail'),
+    path('<int:pk>/show', views.LeaderDetailView.as_view(), name='show'),
     path('create', views.LeaderCreateView.as_view(), name='create'),
-
-    # path('sub-menu/<str:menu_id>', views.get_sub_menu_lists, name='sub-menu'), 
-
-    # path('menu-links', views.MenuLinkListView.as_view(), name='menu-links'),
+    path('<int:pk>/edit', views.LeaderUpdateView.as_view(), name='edit'),
+    path('<int:pk>/delete', views.LeaderDeleteView.as_view(), name='delete'),
 
     
 ]

@@ -273,10 +273,10 @@ def create_profile(**kwargs):
         """send unique number to the user"""
         telerivet.send_message(sender=phone, message=message)
 
-        """send message to WEO"""
+        """send message to MTENDAJI_KATA"""
         if citizen.designation == 'MTENDAJI':
             """query for WEO"""
-            weo = Citizen.objects.filter(ward_id=citizen.working_ward_id, is_active=1, designation="WEO")
+            weo = Citizen.objects.filter(ward_id=citizen.working_ward_id, is_active=1, designation="MTENDAJI_KATA")
 
             if weo.count() > 0:
                 """WEO data"""
@@ -373,8 +373,8 @@ def process_hakiki_thread(**kwargs):
     message = ""
     if citizen.count() > 0:
         citizen = citizen.first()
-        """query citizen belong based on WEO"""
-        if designation == "WEO":
+        """query citizen belong based on MTENDAJI_KATA"""
+        if designation == "MTENDAJI_KATA":
             qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.id)
 
             if qry_citizen.count() > 0:
@@ -466,8 +466,8 @@ def process_thibitisha_thread(**kwargs):
     if citizen.count() > 0:
         citizen = citizen.first()
 
-        """query citizen belong based on WEO"""
-        if designation == "WEO":
+        """query citizen belong based on MTENDAJI_KATA"""
+        if designation == "MTENDAJI_KATA":
             qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.id)
 
             if qry_citizen.count() > 0:

@@ -27,13 +27,21 @@ class Citizen(models.Model):
         ('INVALID', 'INVALID'),
     )
 
-    designation       = models.CharField(max_length=30, null=True, blank=True)
+    DESIGNATION_OPTIONS = (
+        ('MTENDAJI_KATA', 'MTENDAJI KATA'),
+        ('MTENDAJI', 'MTENDAJI KIJIJI'),
+        ('MWENYEKITI', 'MWENYEKITI'),
+        ('MJUMBE', 'MJUMBE'),
+        ('MWANANCHI', 'MWANANCHI'),
+    )
+
+    designation       = models.CharField(max_length=30, choices=DESIGNATION_OPTIONS,null=True, blank=True)
     unique_id         = models.CharField(max_length=30, blank=True, null=True)
     name              = models.CharField(max_length=100, blank=True, null=True)
-    phone             = models.CharField(max_length=20, blank=False, null=False)
-    gender            = models.CharField(max_length=10, choices=GENDER_OPTIONS,default='M', blank=True, null=True)
-    dob               = models.CharField(max_length=20, blank=True, null=True)
-    id_type           = models.CharField(max_length=50, choices=ID_TYPE_OPTIONS,default='NIDA', blank=True, null=True)
+    phone             = models.CharField(max_length=20, blank=False, null=False, unique = True)
+    gender            = models.CharField(max_length=10, choices=GENDER_OPTIONS, blank=True, null=True)
+    dob               = models.DateField(null=True, blank=True)
+    id_type           = models.CharField(max_length=50, choices=ID_TYPE_OPTIONS, blank=True, null=True)
     id_number         = models.CharField(max_length=50, blank=True, null=True)
     ward              = models.ForeignKey(Ward, related_name="citizen_ward", on_delete=models.DO_NOTHING, blank=True, null=True)
     village           = models.ForeignKey(Village, related_name="citizen_village", on_delete=models.DO_NOTHING, blank=True, null=True)

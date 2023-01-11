@@ -16,7 +16,7 @@
                 </div>
                 <div class="col-12 col-xl-auto mb-3">
                     <a href="{% url 'leaders:create' %}" class="btn btn-sm btn-light text-primary">
-                        <i class="me-1" data-feather="add"></i> Register VEO
+                        <i class="me-1" data-feather="add"></i> Register New
                     </a>
                 </div>
             </div>
@@ -28,17 +28,26 @@
 <div class="container-xl px-0 mt-4">
     <div class="row">
         <div class="col-xl-12 col-md-12">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
             <table id="dt" class="table table-hover table-bordered">
                 <thead>
                     <tr>
                         <th width="3%">#</th>
-                        <th width=18%>Full name</th>
+                        <th width=14%>Full Name</th>
+                        <th width="10%">Designation</th>
+                        <th width="12%">Unique No.</th>
                         <th width="10%">Phone</th>
-                        <th width="10%">Sex</th>
-                        <th width="10%">Date of Birth</th>
-                        <th width="10%">ID Number</th>
-                        <th width="10%">House Number</th>
-                        <th width="12%">Location</th>
+                        <th width="6%">Gender</th>
+                        <th width="12%">ID Number</th>
+                        <th width="14%">Location</th>
+                        <th width="8%">Status</th>
                         <th style="width: 40px;">Action</th>
                     </tr>
                 </thead>
@@ -48,29 +57,38 @@
                     <tr>
                         <td>{{forloop.counter}}</td>
                         <td>{{ val.name }}</td>
+                        <td>{{ val.designation }}</td>
+                        <td>{{ val.unique_id }}</td>
                         <td>{{ val.phone }}</td>
+                        <td>{{ val.gender }}</td>
+                        <td>{{ val.id_number|default:"" }}</td>
                         <td>
-                            {% if val.sex == '1' %}
-                            Male
-                            {% elif val.sex == '2' %}
-                            Female
+                            D: {{val.working_ward.district.name}}<br />
+                            W: {{val.working_ward.name}}<br />
+                            V: {{ val.working_village.name }}
+                        </td>
+                        <td>
+                            {% if val.status == 'COMPLETED' %}
+                                <label class="badge bg-info">COMPLETED</label>
+                            {% elif val.status == 'UNVERIFIED' %}
+                                <label class="badge bg-danger">UNVERIFIED</label>
+                            {% elif val.status == 'VERIFIED' %}
+                                <label class="badge bg-success">VERIFIED</label>
+                            {% elif val.status == 'PENDING' %}
+                                <label class="badge bg-warning">PENDING</label>
                             {% endif %}
                         </td>
-                        <td>{{ val.dob }}</td>
-                        <td>{{ val.id_number|default:"" }}</td>
-                        <td>{{ val.house_number|default:"" }}</td>
                         <td>
-                            D: {{val.village.ward.district.name}}<br />
-                            W: {{val.village.ward.name}}<br />
-                            V: {{ val.village.name }}
-                        </td>
-                        <td>
-                            <a href="#" title="Info" class="btn btn-xss">
+                            <a href="{% url 'leaders:show' val.id %}" title="Info" class="btn btn-xss">
                                 <i class="fa-regular fa-eye"></i>
                             </a>
 
-                            <a href="#" title="Edit" class="btn btn-xss">
+                            <a href="{% url 'leaders:edit' val.id %}" title="Edit" class="btn btn-xss">
                                 <i class="fa-regular fa-pen-to-square text-secondary"></i>
+                            </a>
+
+                            <a href="{% url 'leaders:delete' val.id %}" title="Delete" class="btn btn-xss">
+                                <i class="fa-regular fa-trash-can text-danger"></i>
                             </a>
                         </td>
                     </tr>

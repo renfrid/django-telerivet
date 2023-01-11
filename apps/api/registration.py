@@ -23,6 +23,9 @@ class RegistrationWrapper:
             return datetime.strptime(date_in, '%d-%m-%Y').date() 
         elif '/' in date_in:    
             return datetime.strptime(date_in, '%d/%m/%Y').date() 
+        else:
+            return datetime.strptime(date_in, '%d%m%Y').date() 
+
 
     def format_gender(self, **kwargs):
         """format gender"""
@@ -46,9 +49,11 @@ class RegistrationWrapper:
         """generate unique ID"""
         designation = kwargs['designation']
         postcode = "999"
-        randno = random.randint(10000, 99999)  
+        randno = random.randint(10000, 99999) 
 
-        if designation == 'MTENDAJI':
+        if designation == 'MTENDAJI_KATA':
+            label = "WEO" 
+        elif designation == 'MTENDAJI':
             label = 'VEO'
         elif designation == 'MJUMBE':
             label = 'MJB' 
@@ -61,9 +66,19 @@ class RegistrationWrapper:
         return unique_id     
 
 
-
     def generate_pin(self, **kwargs):
         """Generate pin for users"""
         pin_size = kwargs['pin_size']
 
         return ''.join(random.choice(string.digits) for x in range(pin_size)) 
+
+    def format_phone(self, **kwargs):
+        """Format phone number"""
+        phone = kwargs['phone']
+        
+        if phone.startswith('0'):
+            return "+255" + phone[1:]
+        elif len(phone) == 9:
+            return "+255" + phone
+        else:
+            return phone
