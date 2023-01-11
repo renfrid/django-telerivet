@@ -23,13 +23,9 @@ def webhook(request):
         return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
     if request.POST.get('event') == 'incoming_message':
-        content = request.POST.get('content')
+        key = request.POST.get('content')
         from_number = request.POST.get('from_number')
         phone_id = request.POST.get('phone_id')
-
-        """split content into piece"""
-        keyword = content.split(' ', maxsplit=2)
-        key = keyword[0]
 
         print("key => " + key)
         print("from number => " + from_number)
@@ -86,34 +82,7 @@ def webhook(request):
                     elif citizen.status == 'PENDING':
                         message = process_threads(from_number=from_number, key=key, designation=citizen.designation)   
                 else:
-                    message = 'Namba imeshatumika kwa huduma nyingine' 
-            elif key.upper() == 'HAKIKI':
-                if citizen.status == 'COMPLETED':
-                    message = 'Hauwezi kutumia huduma hii mpaka uwe umethibitishwa na ngazi ya juu. Tafadhali wasiliana na ngazi ya juu kwa uhakiki.'
-                elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
-                    message = 'Samahani, akaunti yako imesitishwa. Tafadhali wasiliana na ngazi ya juu kurudisha akaunti yako.'
-                elif citizen.status == 'VERIFIED' and citizen.is_active == 1:
-                    if keyword[1] is None or keyword[2] is None:
-                        message = 'Umekosea kutumia huduma ya HAKIKI, kutumia huduma hii andika neno HAKIKA ikifuatiwa na Namba ya usajili na neno siri lako. Mfano HAKIKI MJB-999-45166 1234'  
-                    else:
-                        unique_id = keyword[1] 
-                        pin       = keyword[2] 
-                        """process HAKIKI thread"""
-                        message = process_hakiki_thread(from_number=from_number, pin=pin, unique_id=unique_id, designation=citizen.designation)
-            elif key.upper() == 'THIBITISHA':   
-                if citizen.status == 'COMPLETED':
-                    message = 'Hauwezi kutumia huduma hii mpaka uwe umethibitishwa na ngazi ya juu. Tafadhali wasiliana na ngazi ya juu kwa uhakiki.'
-                elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
-                    message = 'Samahani, akaunti yako imesitishwa. Tafadhali wasiliana na ngazi ya juu kurudisha akaunti yako.'
-                elif citizen.status == 'VERIFIED' and citizen.is_active == 1:
-                    if keyword[1] is None or keyword[2] is None:
-                        message = 'Umekosea kutumia huduma ya THIBITISHA, kutumia huduma hii andika neno THIBITISHA ikifuatiwa na Namba ya usajili na msimbo uliotumiwa wakati wa HAKIKI. Mfano THIBITISHA MJB-999-45166 1234'  
-                    else:
-                        unique_id = keyword[1] 
-                        otp       = keyword[2] 
-                        """process THIBITISHA thread"""
-                        message = ""
-                        message = process_thibitisha_thread(from_number=from_number, otp=otp, unique_id=unique_id, designation=citizen.designation)              
+                    message = 'Namba imeshatumika kwa huduma nyingine'              
             elif key.upper() == 'JEMBE':
                 if citizen.designation == 'MWANANCHI':
                     if citizen.status == 'VERIFIED' and citizen.is_active == 1:
@@ -123,7 +92,39 @@ def webhook(request):
                 else:
                     message = 'Huduma hii inatumiwa na mwananchi pekee.'    
             else:
-                message = process_threads(from_number=from_number, key=key, designation=citizen.designation)
+                """split content into piece"""
+                arr_key = key.split(' ', maxsplit=2)
+                keyword = arr_key[0]
+
+                if keyword.upper() == 'HAKIKI':
+                    if citizen.status == 'COMPLETED':
+                        message = 'Hauwezi kutumia huduma hii mpaka uwe umethibitishwa na ngazi ya juu. Tafadhali wasiliana na ngazi ya juu kwa uhakiki.'
+                    elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
+                        message = 'Samahani, akaunti yako imesitishwa. Tafadhali wasiliana na ngazi ya juu kurudisha akaunti yako.'
+                    elif citizen.status == 'VERIFIED' and citizen.is_active == 1:
+                        if arr_key[1] is None or arr_key[2] is None:
+                            message = 'Umekosea kutumia huduma ya HAKIKI, kutumia huduma hii andika neno HAKIKA ikifuatiwa na Namba ya usajili na neno siri lako. Mfano HAKIKI MJB-999-45166 1234'  
+                        else:
+                            unique_id = arr_key[1] 
+                            pin       = arr_key[2] 
+                            """process HAKIKI thread"""
+                            message = process_hakiki_thread(from_number=from_number, pin=pin, unique_id=unique_id, designation=citizen.designation)
+                elif keyword.upper() == 'THIBITISHA': 
+                    if citizen.status == 'COMPLETED':
+                        message = 'Hauwezi kutumia huduma hii mpaka uwe umethibitishwa na ngazi ya juu. Tafadhali wasiliana na ngazi ya juu kwa uhakiki.'
+                    elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
+                        message = 'Samahani, akaunti yako imesitishwa. Tafadhali wasiliana na ngazi ya juu kurudisha akaunti yako.'
+                    elif citizen.status == 'VERIFIED' and citizen.is_active == 1:
+                        if arr_key[1] is None or arr_key[2] is None:
+                            message = 'Umekosea kutumia huduma ya THIBITISHA, kutumia huduma hii andika neno THIBITISHA ikifuatiwa na Namba ya usajili na msimbo uliotumiwa wakati wa HAKIKI. Mfano THIBITISHA MJB-999-45166 1234'  
+                        else:
+                            unique_id = arr_key[1] 
+                            otp       = arr_key[2] 
+                            """process THIBITISHA thread"""
+                            message = ""
+                            message = process_thibitisha_thread(from_number=from_number, otp=otp, unique_id=unique_id, designation=citizen.designation)
+                else:            
+                    message = process_threads(from_number=from_number, key=key, designation=citizen.designation)
 
         """return response to telerivet"""
         return HttpResponse(json.dumps({
