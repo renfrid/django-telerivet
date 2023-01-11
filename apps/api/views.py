@@ -19,13 +19,13 @@ def webhook(request):
 
     # return HttpResponse('executed')
 
-    if request.POST.get('secret') != webhook_secret:
-        return HttpResponse("Invalid webhook secret", 'text/plain', 403)
+    # if request.POST.get('secret') != webhook_secret:
+    #     return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
-    if request.POST.get('event') == 'incoming_message':
-        content = request.POST.get('content')
-        from_number = request.POST.get('from_number')
-        phone_id = request.POST.get('phone_id')
+    if request.GET.get('event') == 'incoming_message':
+        content = request.GET.get('content')
+        from_number = request.GET.get('from_number')
+        phone_id = request.GET.get('phone_id')
 
         """split content into piece"""
         keyword = content.split(' ', maxsplit=2)
@@ -185,6 +185,7 @@ def process_threads(**kwargs):
                     """process data"""
                     response = telerivet.process_data(uuid=OD_uuid)
                     my_data = json.loads(response.content)
+                    print(my_data)
                     result = create_profile(phone=from_number, response=my_data)
 
         elif menu_response == 'INVALID_INPUT':
@@ -209,6 +210,8 @@ def create_profile(**kwargs):
     """create profile for MTENDAJI, MWANANCHI, MJUMBE"""
     phone    = kwargs['phone']
     response = kwargs['response']
+
+    print("reaches create profile")
 
     """registration wrapper"""
     formating = RegistrationWrapper()
@@ -257,7 +260,7 @@ def create_profile(**kwargs):
             citizen.hamlet     = response['arr_data']['hamlet']
             citizen.work       = response['arr_data']['work']
             citizen.physical_address = response['arr_data']['house_number']
-            citizen.be_jembe = response['arr_data']['be_jembe']
+            citizen.be_jembe = formating.format_be_jembe(be_jembe=response['arr_data']['be_jembe'])
 
         citizen.status = 'COMPLETED'
         citizen.save()

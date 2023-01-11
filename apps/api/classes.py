@@ -69,7 +69,7 @@ class TelerivetWrapper:
         if key.upper() == 'MTENDAJI':
             menu = Menu.objects.get(flag="Mtendaji_Name")
             designation = "MTENDAJI"
-        elif key == 'MJUMBE':
+        elif key.upper() == 'MJUMBE':
             menu = Menu.objects.get(flag="Mjumbe_Name")
             designation = "MJUMBE"
         elif key.upper() == 'MWANANCHI':
@@ -177,7 +177,13 @@ class TelerivetWrapper:
                 session_id = self.create_menu_session(phone=phone,menu_id=menu_link[0].link_id,uuid=uuid)
 
                 """process menu"""
-                message = self.process_menu(menu_link[0].link_id, phone, uuid, designation)            
+                message = self.process_menu(menu_link[0].link_id, phone, uuid, designation) 
+
+                """menu action"""
+                menu = Menu.objects.get(pk=menu_link[0].link_id)
+
+                if menu.action is not None:
+                    action = menu.action           
             else:
                 """message"""
                 message = "Invalid input"

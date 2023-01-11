@@ -33,6 +33,15 @@ class RegistrationWrapper:
         else:
             return 'F'
 
+    def format_be_jembe(self, **kwargs):
+        """format gender"""
+        be_jembe = kwargs['be_jembe']
+
+        if be_jembe == "Ndiyo":
+            return 1
+        elif be_jembe == 'Hapana':
+            return 0
+
     def generate_unique_id(self, **kwargs):
         """generate unique ID"""
         designation = kwargs['designation']
