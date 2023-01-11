@@ -14,11 +14,6 @@ def webhook(request):
     webhook_secret = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     message = "Welcome to Bukoba Project."
 
-    # telerivet = TelerivetWrapper()
-    # telerivet.send_message(sender='+255717705746', message=message)
-
-    # return HttpResponse('executed')
-
     if request.POST.get('secret') != webhook_secret:
         return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
