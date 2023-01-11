@@ -1,5 +1,6 @@
 {% extends 'layouts/app-with-nav.html' %}
 {% load static %}
+{% load humanize %}
 {% block title %} Dashboard {% endblock %}
 
 {% block content %}
@@ -11,7 +12,7 @@
                 <div class="col-auto mb-3">
                     <h1 class="page-header-title">
                         <div class="page-header-icon"><i data-feather="activity"></i></div>
-                        National Summary - {{ cur_year}}
+                        Summaries
                     </h1>
                 </div>
             </div>
@@ -22,11 +23,76 @@
 <!-- Main page content-->
 <div class="container-xl px-4 mt-3">
     <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Dashboard info widget 1-->
+            <div class="card border-start-lg border-start-primary h-80">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="medium fw-bold text-primary mb-1">Total Citizen</div>
+                            <div class="h5">{{ total|intcomma }}</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-people-arrows fa-2x text-info"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Dashboard info widget 2-->
+            <div class="card border-start-lg border-start-success h-80">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="medium fw-bold text-success mb-1">Verified</div>
+                            <div class="h5">{{ verified|intcomma }}</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-people-arrows fa-2x text-success"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Dashboard info widget 3-->
+            <div class="card border-start-lg border-start-danger h-80">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="medium fw-bold text-danger mb-1">Unverified</div>
+                            <div class="h5">{{ unverified|intcomma }}</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-people-arrows fa-2x text-danger"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <!-- Dashboard info widget 4-->
+            <div class="card border-start-lg border-start-warning h-80">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="medium fw-bold text-warning mb-1">Pending</div>
+                            <div class="h5">{{ pending|intcomma }}</div>
+                        </div>
+                        <div class="ms-2"><i class="fas fa-people-arrows fa-2x text-warning"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-lg-12 col-md-12">
 
             <div class="card">
-                <div class="card-body" style="padding: 2px !important;">
-                    <div id="map" style="width: 100%; min-height:600px; height: auto;"></div>
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h5 class="m-0 font-weight-bold">Male vs Female Citizens</h5>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" id="wardChart" style="height: 480px;"></div>
                 </div>
             </div>
         </div>
@@ -38,8 +104,5 @@
 {% endblock content %}
 
 {% block extra_js %}
-
-<script type="text/javascript">
-    
-</script>
+{% include 'charts.html' %}
 {% endblock extra_js %}
