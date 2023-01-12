@@ -263,7 +263,13 @@ def create_profile(**kwargs):
 
         """create customized message for user"""
         message = "Usajili wako wa awali umekamilika.Nambari yako ya usajili ni " + unique_id + ".\n\n"
-        message += "Tafadhali wasiliana na afisa mtendaji wako wa kata kwa uhakiki."
+
+        if citizen.designation == 'MTENDAJI':
+            message += "Tafadhali wasiliana na afisa mtendaji wako wa kata kwa uhakiki."
+        elif citizen.designation == 'MJUMBE':
+            message += "Tafadhali wasiliana na afisa mtendaji wako wa kijiji au kata kwa uhakiki."
+        elif citizen.designation == 'MWANANCHI': 
+            message += "Tafadhali wasiliana na afisa mjumbe wako au mtendaji wa kijiji kwa uhakiki."  
 
         """send unique number to the user"""
         telerivet.send_message(sender=phone, message=message)
