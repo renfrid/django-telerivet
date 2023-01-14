@@ -14,13 +14,13 @@ def webhook(request):
     webhook_secret = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     message = "Welcome to Bukoba Project."
 
-    # if request.POST.get('secret') != webhook_secret:
-    #     return HttpResponse("Invalid webhook secret", 'text/plain', 403)
+    if request.POST.get('secret') != webhook_secret:
+        return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
-    if request.GET.get('event') == 'incoming_message':
-        key = request.GET.get('content')
-        from_number = request.GET.get('from_number')
-        phone_id = request.GET.get('phone_id')
+    if request.POST.get('event') == 'incoming_message':
+        key = request.POST.get('content')
+        from_number = request.POST.get('from_number')
+        phone_id = request.POST.get('phone_id')
 
         print("key => " + key)
         print("from number => " + from_number)
@@ -385,7 +385,7 @@ def process_hakiki_thread(**kwargs):
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
 
-                if qry_citizen.status == 'COMPLETE':
+                if qry_citizen.status == 'COMPLETED':
                     """generate OTP"""
                     otp = formating.generate_pin(pin_size=6)
 
@@ -395,18 +395,30 @@ def process_hakiki_thread(**kwargs):
                         defaults={'otp': otp, 'status': 1},
                     )
 
+                    occupation = ""
+                    if qry_citizen.work is not None:
+                        occupation = qry_citizen.work
+
+                    village_name = ""
+                    if qry_citizen.village_id is not None:
+                        village_name = qry_citizen.village.name
+
+                    hamlet = ""
+                    if qry_citizen.hamlet is not None:
+                        hamlet = qry_citizen.hamlet 
+
                     """message"""
                     message = "Hakiki taarifa zifuatazo:\n" \
-                            "Namba: "+qry_citizen.unique_id+"\n" \
-                            "Jina: "+qry_citizen.name+"\n" \
-                            "Simu: "+qry_citizen.phone+"\n" \
-                            "Kazi: "+qry_citizen.work+"\n" \
-                            "Kitambulisho: "+qry_citizen.id_type+"\n" \
+                            "Namba: "+ str(qry_citizen.unique_id) +"\n" \
+                            "Jina: "+ qry_citizen.name +"\n" \
+                            "Simu: " +qry_citizen.phone +"\n" \
+                            "Kazi: " + occupation + "\n" \
+                            "Kitambulisho: " + qry_citizen.id_type+"\n" \
                             "Kitamb. Namba: "+ qry_citizen.id_number+"\n"\
-                            "Kata: "+qry_citizen.ward.name+"\n" \
-                            "Mtaa/Kijiji: "+qry_citizen.village.name+"\n" \
-                            "Kitongoji: "+qry_citizen.hamlet+"\n"\
-                            "Kuthibitisha tuma neno THIBITISHA likifuatiwa na namba ya usajili ya mwananchi, ikifuatiwa na namba ya msimbo huu wa siri "+otp+"\n" \
+                            "Kata: " + qry_citizen.ward.name+"\n" \
+                            "Mtaa/Kijiji: "+ village_name+"\n" \
+                            "Kitongoji: " + hamlet + "\n"\
+                            "Kuthibitisha tuma neno THIBITISHA likifuatiwa na namba ya usajili ya mwananchi, ikifuatiwa na namba ya msimbo huu wa siri "+ str(otp)+"\n" \
                             "Mfano: THIBITISHA MNC-999-54865 748593."
                 elif qry_citizen.status == 'VERIFIED' and qry_citizen.is_active == 1:
                     message = "Samahani, namba ya usajili ya imeshahakikiwa."
@@ -419,7 +431,7 @@ def process_hakiki_thread(**kwargs):
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
 
-                if qry_citizen.status == 'COMPLETE':
+                if qry_citizen.status == 'COMPLETED':
                     """generate OTP"""
                     otp = formating.generate_pin(pin_size=6)
 
@@ -429,17 +441,29 @@ def process_hakiki_thread(**kwargs):
                         defaults={'otp': otp, 'status': 1},
                     )
 
+                    occupation = ""
+                    if qry_citizen.work is not None:
+                        occupation = qry_citizen.work
+
+                    village_name = ""
+                    if qry_citizen.village_id is not None:
+                        village_name = qry_citizen.village.name
+
+                    hamlet = ""
+                    if qry_citizen.hamlet is not None:
+                        hamlet = qry_citizen.hamlet
+
                     """message"""
                     message = "Hakiki taarifa zifuatazo:\n" \
                             "Namba: "+qry_citizen.unique_id+"\n" \
                             "Jina: "+qry_citizen.name+"\n" \
                             "Simu: "+qry_citizen.phone+"\n" \
-                            "Kazi: "+qry_citizen.work+"\n" \
+                            "Kazi: "+occupation+"\n" \
                             "Kitambulisho: "+qry_citizen.id_type+"\n" \
                             "Kitamb. Namba: "+ qry_citizen.id_number+"\n"\
                             "Kata: "+qry_citizen.ward.name+"\n" \
-                            "Mtaa/Kijiji: "+qry_citizen.village.name+"\n" \
-                            "Kitongoji: "+qry_citizen.hamlet+"\n"\
+                            "Mtaa/Kijiji: "+village_name+"\n" \
+                            "Kitongoji: "+hamlet+"\n"\
                             "Kuthibitisha tuma neno THIBITISHA likifuatiwa na namba ya usajili ya mwananchi, ikifuatiwa na namba ya msimbo huu wa siri "+otp+"\n" \
                             "Mfano: THIBITISHA MNC-999-54865 748593."
                 elif qry_citizen.status == 'VERIFIED' and qry_citizen.is_active == 1:
