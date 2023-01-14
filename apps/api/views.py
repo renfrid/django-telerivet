@@ -244,10 +244,14 @@ def create_profile(**kwargs):
         if citizen.designation == 'MTENDAJI':
             citizen.working_ward_id    = response['arr_data']['working_ward']
             citizen.working_village_id = response['arr_data']['working_village']
+            citizen.ward_id            = response['arr_data']['working_ward']
+            citizen.village_id         = response['arr_data']['working_village']
 
         elif citizen.designation == 'MJUMBE':
             citizen.working_ward_id    = response['arr_data']['working_ward']
             citizen.working_village_id = response['arr_data']['working_village']
+            citizen.ward_id            = response['arr_data']['working_ward']
+            citizen.village_id         = response['arr_data']['working_village']
             citizen.working_shina = response['arr_data']['working_shina']
 
         elif citizen.designation == 'MWANANCHI':
@@ -376,7 +380,7 @@ def process_hakiki_thread(**kwargs):
         citizen = citizen.first()
         """query citizen belong based on MTENDAJI_KATA"""
         if designation == "MTENDAJI_KATA":
-            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.id)
+            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id, ward_id=citizen.working_ward.id)
 
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
@@ -410,7 +414,7 @@ def process_hakiki_thread(**kwargs):
                 message = "Samahani, taarifa zako hazijakimilika"
 
         elif designation == 'MTENDAJI' or designation == 'MJUMBE':
-            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.ward.id, village_id=citizen.village.id)
+            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.working_ward.id, village_id=citizen.working_village.id)
 
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
@@ -469,7 +473,7 @@ def process_thibitisha_thread(**kwargs):
 
         """query citizen belong based on MTENDAJI_KATA"""
         if designation == "MTENDAJI_KATA":
-            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.id)
+            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id, ward_id=citizen.working_ward.id)
 
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
@@ -488,7 +492,7 @@ def process_thibitisha_thread(**kwargs):
                     qry_citizen.save()
 
                     """Inform citizen after verification"""
-                    message_to_citizen = "Habari, usajili wako umekamilika. Tuma neno JIHAKIKI kupata huduma za JIHAKIKI."
+                    message_to_citizen = "Habari, usajili wako umekamilika. Msimbo wako ni " + qry_citizen.password +". Tuma neno JIHAKIKI kupata huduma za JIHAKIKI. "
                     qry_citizen_phone = qry_citizen.phone
                     telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
 
@@ -498,7 +502,7 @@ def process_thibitisha_thread(**kwargs):
                 message = "Samahani, taarifa zako hazijakimilika"  
 
         elif designation == 'MTENDAJI' or designation == 'MJUMBE': 
-            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.ward.id, village_id=citizen.village.id)
+            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id,ward_id=citizen.working_ward.id, village_id=citizen.working_village.id)
 
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
@@ -517,7 +521,7 @@ def process_thibitisha_thread(**kwargs):
                     qry_citizen.save()
 
                     """Inform citizen after verification"""
-                    message_to_citizen = "Habari, usajili wako umekamilika. Tuma neno JIHAKIKI kupata huduma za JIHAKIKI."
+                    message_to_citizen = "Habari, usajili wako umekamilika. Msimbo wako ni " + qry_citizen.password +". Tuma neno JIHAKIKI kupata huduma za JIHAKIKI."
                     qry_citizen_phone = qry_citizen.phone
                     telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
 
