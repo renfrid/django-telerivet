@@ -10,6 +10,7 @@ from django.contrib import messages
 from .forms import LeaderForm
 from apps.citizen.models import Citizen
 from apps.api.registration import RegistrationWrapper
+from apps.api.classes import TelerivetWrapper
 
 
 class LeaderListView(generic.ListView):
@@ -82,20 +83,32 @@ class LeaderCreateView(generic.CreateView):
         """registration wrapper"""
         formating = RegistrationWrapper()
 
+        """telerivet wrapper"""
+        telerivet = TelerivetWrapper()
+
         if form.is_valid():
             designation = request.POST.get('designation')
+            name = request.POST.get('name')
+            pin  = formating.generate_pin(pin_size=4)
+            phone = formating.format_phone(phone=request.POST.get('phone'))
 
             """save POST data"""
             dt_leader = form.save(commit=False)
             dt_leader.created_by = request.user
             dt_leader.is_active = 1
             dt_leader.status = 'VERIFIED'
-            dt_leader.password = formating.generate_pin(pin_size=4)
+            dt_leader.password = pin
             dt_leader.unique_id = formating.generate_unique_id(designation=designation)
-            dt_leader.phone = formating.format_phone(phone=request.POST.get('phone'))
+            dt_leader.phone = phone
             dt_leader.save()
 
-            messages.success(request, 'Leader registered!')
+            """Message to WEO"""
+            message_to_weo = "Habari " + name + ", usajili wako umekamilika. Neno siri ni " + pin + "."
+
+            """send message to MWANANCHI"""
+            telerivet.send_message(sender=phone, message=message_to_weo)
+
+            messages.success(request, 'New Leader registered!')
             return HttpResponseRedirect(reverse_lazy('leaders:lists'))
         return render(request, 'leaders/create.html', {'form': form})  
 
