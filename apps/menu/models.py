@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Keyword(models.Model):
-    title = models.CharField(max_length=50, blank=False, null=False)
+    title     = models.CharField(max_length=50, blank=False, null=False)
+    sequence  =  models.IntegerField(blank=True, null=True, default=0)
 
     class Meta:
         db_table = 'dt_keywords'

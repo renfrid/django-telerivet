@@ -19,6 +19,7 @@ urlpatterns = [
 
     #menu links
     path('menu-links', views.MenuLinkListView.as_view(), name='menu-links'),
+    path('menu-links/<int:pk>/delete', views.MenuLinkDeleteView.as_view(), name='delete-menu-link'),
 
     
 ]

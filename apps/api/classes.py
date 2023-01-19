@@ -14,8 +14,8 @@ import telerivet
 
 
 class TelerivetWrapper:
-    #BASE_URL   = "http://127.0.0.1:8000/"
-    BASE_URL   = "http://jinadi.happen.co.tz/"
+    BASE_URL   = "http://127.0.0.1:8000/"
+    #BASE_URL   = "http://jinadi.happen.co.tz/"
     API_TOKEN  = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     # API_KEY = 'ZaCNa_cgefsjQ3eDLQ8JH33RvMuQ1qQmTT2h'
     API_KEY = 'c7fAkAuMy8a6aUZQWyNNyYXSutXuszcV'
@@ -40,10 +40,12 @@ class TelerivetWrapper:
         """menu"""
         if key.upper() == 'MTENDAJI':
             menu = Menu.objects.get(flag="Mtendaji_Name") 
+        elif key.upper() == 'MWENYEKITI':
+            menu = Menu.objects.get(flag="Mwenyekiti_Name")
         elif key.upper() == 'MJUMBE':
             menu = Menu.objects.get(flag="Mjumbe_Name")
         elif key.upper() == 'MWANANCHI':
-            menu = Menu.objects.get(flag='Mwanachi_Name')    
+            menu = Menu.objects.get(flag='Mwananchi_Name')    
 
         """random code"""
         uuid = ''.join(random.choices(string.ascii_uppercase, k=12))
@@ -69,11 +71,14 @@ class TelerivetWrapper:
         if key.upper() == 'MTENDAJI':
             menu = Menu.objects.get(flag="Mtendaji_Name")
             designation = "MTENDAJI"
+        elif key.upper() == 'MWENYEKITI':
+            menu = Menu.objects.get(flag="Mwenyekiti_Name")
+            designation = "MWENYEKITI"   
         elif key.upper() == 'MJUMBE':
             menu = Menu.objects.get(flag="Mjumbe_Name")
             designation = "MJUMBE"
         elif key.upper() == 'MWANANCHI':
-            menu = Menu.objects.get(flag='Mwanachi_Name')
+            menu = Menu.objects.get(flag='Mwananchi_Name')
             designation = "MWANANCHI"
 
         """Create new temporary data"""
@@ -227,6 +232,12 @@ class TelerivetWrapper:
             if menu_session:
                 message = message.replace("ID_Number", menu_session.values)
 
+        if menu.flag == 'Mwenyekiti_Verify_ID':
+            menu_session = MenuSession.objects.filter(flag="Mwenyekiti_ID_Number", phone=phone).last()
+
+            if menu_session:
+                message = message.replace("ID_Number", menu_session.values)
+
         if menu.flag == 'Mjumbe_Verify_ID':
             menu_session = MenuSession.objects.filter(flag='Mjumbe_ID_Number', phone=phone).last()
 
@@ -277,8 +288,8 @@ class TelerivetWrapper:
         session.flag = menu.flag
         session.save()
 
+        """return session ID"""
         return session.id
-
 
 
     def send_message(self, **kwargs):

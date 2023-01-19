@@ -63,9 +63,9 @@
                         <td>{{ val.gender }}</td>
                         <td>{{ val.id_number|default:"" }}</td>
                         <td>
-                            D: {{val.working_ward.district.name}}<br />
-                            W: {{val.working_ward.name}}<br />
-                            V: {{ val.working_village.name }}
+                            D: {{val.ward.district.name}}<br />
+                            W: {{val.ward.name}}<br />
+                            V: {{ val.village.name }}
                         </td>
                         <td>
                             {% if val.status == 'COMPLETED' %}

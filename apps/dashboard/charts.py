@@ -19,7 +19,7 @@ class WardChartView(APIView):
         arr_data = []
         for val in wards:
             """male citizens"""
-            male_citizen = Citizen.objects.filter(ward_id=val.id, gender='M')
+            male_citizen = Citizen.objects.filter(ward_id=val.id, gender="M", designation="MWANANCHI")
 
             if status != '' and status is not None:
                 male_citizen = male_citizen.filter(status__exact = request.GET.get('status'))
@@ -27,7 +27,7 @@ class WardChartView(APIView):
             male_citizen = male_citizen.count()    
         
             """female citizen"""
-            female_citizen = Citizen.objects.filter(ward_id=val.id, gender='F')
+            female_citizen = Citizen.objects.filter(ward_id=val.id, gender="F", designation="MWANANCHI")
 
             if status != '' and status is not None:
                 female_citizen = female_citizen.filter(status__exact = request.GET.get('status'))

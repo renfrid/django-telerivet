@@ -13,12 +13,12 @@ class LeaderForm(forms.ModelForm):
         self.fields['designation'].empty_label      = 'Select'
         self.fields['gender'].empty_label           = 'Select'
         self.fields['id_type'].empty_label          = 'Select'
-        self.fields['working_ward'].empty_label     = 'Select'
-        self.fields['working_village'].empty_label  = 'Select'
+        self.fields['ward'].empty_label     = 'Select'
+        self.fields['village'].empty_label  = 'Select'
 
     class Meta:
         model  = Citizen
-        exclude =('be_jembe', 'ward' ,'village', 'shina', 'password', 'unique_id', 'created_by', 'updated_by')
+        exclude =('be_jembe', 'password', 'unique_id', 'created_by', 'updated_by')
         fields  = ('__all__')
 
         widgets = {
@@ -30,9 +30,9 @@ class LeaderForm(forms.ModelForm):
             'dob': forms.DateInput(attrs={'class': 'form-control', 'id': 'dob', 'placeholder': 'Write dob...', 'type': 'date', 'required':'' }),
             'id_type': forms.Select(attrs={'class': 'form-control', 'id': 'id_type', 'required':''}),
             'id_number': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_number', 'placeholder': 'Write id number...', 'required':'' }),
-            'working_ward': forms.Select(attrs={'class': 'form-control', 'id': 'ward_id', 'required':''}),
-            'working_village': forms.Select(attrs={'class': 'form-control', 'id': 'village_id', 'required':''}),
-            'working_shina': forms.TextInput(attrs={'class': 'form-control', 'id': 'working_shina', 'placeholder': 'Write shina...', }),
+            'ward': forms.Select(attrs={'class': 'form-control', 'id': 'ward_id', 'required':''}),
+            'village': forms.Select(attrs={'class': 'form-control', 'id': 'village_id', 'required':''}),
+            'shina': forms.TextInput(attrs={'class': 'form-control', 'id': 'shina', 'placeholder': 'Write shina...', }),
         } 
 
         labels = {
@@ -43,6 +43,6 @@ class LeaderForm(forms.ModelForm):
             'dob': 'Date of birth',
             'id_type': 'ID Type',
             'id_number': 'ID Number',
-            'working_ward': 'Ward',
-            'working_village': 'Village',
+            'ward': 'Ward',
+            'village': 'Village',
         }   

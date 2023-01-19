@@ -24,7 +24,7 @@ class MenuListView(generic.ListView):
         context = super(MenuListView, self).get_context_data(**kwargs)
         context['title'] = "Menu"
 
-        keyword = Keyword.objects.all()
+        keyword = Keyword.objects.all().order_by("sequence")
         context['keyword'] = keyword
 
         return context
@@ -117,7 +117,10 @@ class MenuUpdateView(generic.UpdateView):
 class MenuDeleteView(generic.DeleteView):
     """View to delete a menu""" 
     model = Menu
-    success_url = reverse_lazy('setup:menu')
+
+    def get_success_url(self):
+        messages.success(self.request, "Menu deleted successfully")
+        return reverse_lazy('setup:menu') 
 
 
 class SubMenuDeleteView(generic.DeleteView):
@@ -141,7 +144,10 @@ class MenuLinkListView(generic.ListView):
         context = super(MenuLinkListView, self).get_context_data(**kwargs)
         context['title'] = "Menu Links"
         context['keyword'] = Keyword.objects.all()
-        context['menu'] = Menu.objects.filter(keyword_id=3).order_by('step')
+        context['menu'] = Menu.objects.filter(keyword_id=4).order_by('step')
+
+        menu_links = MenuLink.objects.all().order_by("menu__keyword__id", "menu__step")
+        context['menu_links'] = menu_links
 
         return context
 
@@ -162,6 +168,16 @@ class MenuLinkListView(generic.ListView):
 
         #redirect
         return HttpResponseRedirect(reverse_lazy('setup:menu-links'))
+
+class MenuLinkDeleteView(generic.DeleteView):
+    """Delete a menu link""" 
+    model = MenuLink
+    template_name = "menu_links/confirm_delete.html"
+
+    def get_success_url(self):
+        messages.success(self.request, "Menu link deleted successfully")
+        return reverse_lazy('setup:menu-links') 
+
 
 def get_menu_lists(request, *args, **kwargs):
     if request.method == 'GET':

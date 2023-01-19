@@ -25,6 +25,7 @@ class MenuForm(forms.ModelForm):
             'label': forms.TextInput(attrs={'class': 'form-control', 'id': 'label', 'placeholder': 'Write label...', }),
             'pull': forms.NumberInput(attrs={'class': 'form-control', 'id': 'pull', 'placeholder': 'Write pull...', }),
             'url': forms.TextInput(attrs={'class': 'form-control', 'id': 'url', 'placeholder': 'Write pull url...', }),
+            'action': forms.TextInput(attrs={'class': 'form-control', 'id': 'action', 'placeholder': 'Write action...', }),
         } 
 
         labels = {
@@ -33,6 +34,7 @@ class MenuForm(forms.ModelForm):
             'title': 'Title',
             'flag': 'Flag',
             'label': 'Label',
-            'pull': 'PULL',
-            'url': 'PULL URL',
+            'pull': 'Pull',
+            'url': 'Pull URL',
+            'action': 'Action',
         }      

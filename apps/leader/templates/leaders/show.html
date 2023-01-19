@@ -166,31 +166,31 @@
                             <tr>
                                 <th width=25%>Region</th>
                                 <td>
-                                    {{ leader.working_ward.district.region.name }}
+                                    {{ leader.ward.district.region.name }}
                                 </td>
 
                                 <th>District</th>
                                 <td>
-                                    {{ leader.working_ward.district.name }}
+                                    {{ leader.ward.district.name }}
                                 </td>
                             </tr>
 
                             <tr>
                                 <th width=25%>Ward</th>
                                 <td>
-                                    {{ leader.working_ward.name }}
+                                    {{ leader.ward.name }}
                                 </td>
 
                                 <th>Village</th>
                                 <td>
-                                    {{ leader.working_village.name }}
+                                    {{ leader.village.name }}
                                 </td>
                             </tr>
 
                             <tr>
                                 <th width=25%>Shina</th>
                                 <td>
-                                    {{ leader.working_shina|default:"Not applicable" }}
+                                    {{ leader.shina|default:"Not applicable" }}
                                 </td>
                             </tr>
                         </table>

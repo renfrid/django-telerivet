@@ -17,7 +17,7 @@ class CitizenForm(forms.ModelForm):
 
     class Meta:
         model  = Citizen
-        exclude =('be_jembe', 'designation', 'working_ward' ,'working_village', 'working_shina', 'password', 'unique_id', 'created_by', 'updated_by')
+        exclude =('be_jembe', 'designation','shina', 'password', 'unique_id', 'created_by', 'updated_by')
         fields  = ('__all__')
 
         widgets = {

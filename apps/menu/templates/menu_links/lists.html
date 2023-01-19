@@ -121,7 +121,7 @@
                         <td>{{ val.sub_menu.title }}</td>
                         <td>{{ val.link.title }}</td>
                         <td>
-                            <a href="#" title="Delete" class="btn btn-xss delete">
+                            <a href="{% url 'setup:delete-menu-link' val.id %}" title="Delete" class="btn btn-xss delete">
                                 <i class="fa-regular fa-trash-can text-danger"></i>
                             </a>
                         </td>

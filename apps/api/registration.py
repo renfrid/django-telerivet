@@ -55,6 +55,8 @@ class RegistrationWrapper:
             label = "WEO" 
         elif designation == 'MTENDAJI':
             label = 'VEO'
+        elif designation == 'MWENYEKITI':
+            label = 'MKT'            
         elif designation == 'MJUMBE':
             label = 'MJB' 
         elif designation == 'MWANANCHI':
