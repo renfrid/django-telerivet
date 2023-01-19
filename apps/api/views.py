@@ -291,7 +291,7 @@ def create_profile(**kwargs):
         elif citizen.designation == 'MJUMBE':
             message += "Tafadhali wasiliana na afisa mtendaji wako wa kijiji au kata kwa uhakiki."
         elif citizen.designation == 'MWANANCHI': 
-            message += "Tafadhali wasiliana na afisa mjumbe wako au mtendaji wa kijiji kwa uhakiki."  
+            message += "Tafadhali wasiliana na mjumbe au mtendaji wa kijiji kwa uhakiki."  
 
         """send unique number to the user"""
         telerivet.send_message(sender=phone, message=message)
