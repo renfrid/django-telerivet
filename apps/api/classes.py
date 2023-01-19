@@ -14,8 +14,8 @@ import telerivet
 
 
 class TelerivetWrapper:
-    BASE_URL   = "http://127.0.0.1:8000/"
-    #BASE_URL   = "http://jinadi.happen.co.tz/"
+    #BASE_URL   = "http://127.0.0.1:8000/"
+    BASE_URL   = "http://jinadi.happen.co.tz/"
     API_TOKEN  = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     # API_KEY = 'ZaCNa_cgefsjQ3eDLQ8JH33RvMuQ1qQmTT2h'
     API_KEY = 'c7fAkAuMy8a6aUZQWyNNyYXSutXuszcV'
