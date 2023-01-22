@@ -312,51 +312,55 @@ def process_hakiki_thread(**kwargs):
     citizen = Citizen.objects.filter(phone__exact=from_number, password__exact=pin)
 
     message = ""
+    if citizen.count() > 0:
+        citizen = citizen.first()
 
-    """Check who uses the service"""
-    if designation == "MWANANCHI":
-        message = "Hauwezi kutumia huduma hii"
-    else:
-        qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id, ward_id=citizen.ward.id)    
-
-        if qry_citizen.count() > 0:
-            qry_citizen = qry_citizen.first()
-
-            if qry_citizen.status == 'COMPLETED':
-                """generate OTP"""
-                otp = registration.generate_pin(pin_size=6)
-
-                """create or update OTP"""
-                obj, created = Token.objects.update_or_create(
-                    citizen_id=citizen.id, client_id=qry_citizen.id,
-                    defaults={'otp': otp, 'status': 1},
-                )
-
-                occupation = "Hakuna"
-                if qry_citizen.work is not None:
-                    occupation = qry_citizen.work
-
-                hamlet = "Hakuna"
-                if qry_citizen.hamlet is not None:
-                    hamlet = qry_citizen.hamlet 
-
-                """message"""
-                message = "Hakiki taarifa zifuatazo:\n" \
-                    "Namba: "+ str(qry_citizen.unique_id) +"\n" \
-                        "Jina: "+ qry_citizen.name +"\n" \
-                            "Simu: " +qry_citizen.phone +"\n" \
-                                "Kazi: " + occupation + "\n" \
-                                    "Kitambulisho: " + qry_citizen.id_type+"\n" \
-                                        "Kitamb. Namba: "+ qry_citizen.id_number+"\n"\
-                                            "Kata: " + qry_citizen.ward.name+"\n" \
-                                                "Mtaa/Kijiji: "+ qry_citizen.village.name+"\n" \
-                                                    "Kitongoji: " + hamlet + "\n"\
-                    "Kuthibitisha tuma neno THIBITISHA likifuatiwa na namba ya usajili, ikifuatiwa na namba ya msimbo huu wa siri "+ str(otp)+"\n" \
-                    "Mfano: THIBITISHA MNC-999-54865 748593."
-            elif qry_citizen.status == 'VERIFIED' and qry_citizen.is_active == 1:
-                message = "Samahani, namba ya usajili ya imeshahakikiwa."
+        """Check who uses the service"""
+        if designation == "MWANANCHI":
+            message = "Hauwezi kutumia huduma hii"
         else:
-            message = "Samahani, taarifa zako hazijakimilika"
+            qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id, ward_id=citizen.ward_id)    
+
+            if qry_citizen.count() > 0:
+                qry_citizen = qry_citizen.first()
+
+                if qry_citizen.status == 'COMPLETED':
+                    """generate OTP"""
+                    otp = registration.generate_pin(pin_size=6)
+
+                    """create or update OTP"""
+                    obj, created = Token.objects.update_or_create(
+                        verifier_id=citizen.id, client_id=qry_citizen.id,
+                        defaults={'otp': otp, 'status': 1},
+                    )
+
+                    occupation = "Hakuna"
+                    if qry_citizen.work is not None:
+                        occupation = qry_citizen.work
+
+                    hamlet = "Hakuna"
+                    if qry_citizen.hamlet is not None:
+                        hamlet = qry_citizen.hamlet 
+
+                    """message"""
+                    message = "Hakiki taarifa zifuatazo:\n" \
+                        "Namba: "+ str(qry_citizen.unique_id) +"\n" \
+                            "Jina: "+ qry_citizen.name +"\n" \
+                                "Simu: " +qry_citizen.phone +"\n" \
+                                    "Kazi: " + occupation + "\n" \
+                                        "Kitambulisho: " + qry_citizen.id_type+"\n" \
+                                            "Kitamb. Namba: "+ qry_citizen.id_number+"\n"\
+                                                "Kata: " + qry_citizen.ward.name+"\n" \
+                                                    "Mtaa/Kijiji: "+ qry_citizen.village.name+"\n" \
+                                                        "Kitongoji: " + hamlet + "\n"\
+                        "Kuthibitisha tuma neno THIBITISHA likifuatiwa na namba ya usajili, ikifuatiwa na namba ya msimbo huu wa siri "+ str(otp)+"\n" \
+                        "Mfano: THIBITISHA MNC-999-54865 748593."
+                elif qry_citizen.status == 'VERIFIED' and qry_citizen.is_active == 1:
+                    message = "Samahani, namba ya usajili ya imeshahakikiwa."
+            else:
+                message = "Samahani, taarifa zako hazijakimilika"
+    else:
+        message = "Samahani, namba ya siri uliyoingiza sio sahihi. Hakikisha umeingiza tarakimu 4 tu." 
 
     """return  message"""
     return message        
