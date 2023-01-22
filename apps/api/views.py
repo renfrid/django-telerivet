@@ -255,7 +255,6 @@ def create_profile(**kwargs):
         if citizen.designation == 'MTENDAJI':
             citizen.ward_id            = response['arr_data']['working_ward']
             citizen.village_id         = response['arr_data']['working_village']
-            citizen.hamlet             = response['arr_data']['hamlet']
 
         elif citizen.designation == 'MWENYEKITI':
             citizen.ward_id            = response['arr_data']['working_ward']
