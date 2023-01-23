@@ -295,6 +295,56 @@ def create_profile(**kwargs):
         """send unique number to the user"""
         telerivet.send_message(sender=phone, message=message)
 
+        """send message to MTENDAJI_KATA"""
+        if citizen.designation == 'MTENDAJI' or citizen.designation == 'MWENYEKITI':
+            """send message to MTENDAJI_KATA"""
+
+            """query for WEO"""
+            qry_weo = Citizen.objects.filter(ward_id=citizen.ward_id, is_active=1, designation="MTENDAJI_KATA")
+
+            if qry_weo.count() > 0:
+                """WEO information"""
+                qry_weo = qry_weo.last()
+                qry_weo_phone = qry_weo.phone
+
+                """message to WEO"""
+                if citizen.designation == "MTENDAJI":
+                    message_to_weo = "Habari, Mtendaji amejisajili.\n"
+                elif citizen.designation == "MWENYEKITI":
+                    message_to_weo = "Habari, Mwenyekiti amejisajili.\n" 
+
+                """Add more message text"""     
+                message_to_weo += "Namba: "+citizen.unique_id+"\n" \
+                                "Jina: "+citizen.name+"\n" \
+                                    "Kata: "+citizen.ward.name+"\n" \
+                                        "Mtaa/Kijiji: "+citizen.village.name+"\n" \
+                                        "Simu: "+citizen.phone
+
+                """send message to WEO"""
+                telerivet.send_message(sender=qry_weo_phone, message=message_to_weo)      
+
+        elif citizen.designation == 'MJUMBE':
+            """send message to MTENDAJI if was MJUMBE"""
+            
+            """query for MTENDAJI"""
+            qry_veo = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MTENDAJI")
+
+            if qry_veo.count() > 0:
+                """VEO data"""
+                qry_veo = qry_veo.last()
+                qry_veo_phone = qry_veo.phone
+
+                """message to VEO"""
+                message_to_veo = "Habari, mjumbe amejisajili.\n" \
+                            "Namba: "+citizen.unique_id+"\n" \
+                                "Jina: "+citizen.name+"\n" \
+                                    "Kata: "+citizen.ward.name+"\n" \
+                                        "Mtaa/Kijiji: "+citizen.village.name+"\n" \
+                                                "Simu: "+citizen.phone
+
+                """send message to VEO"""
+                telerivet.send_message(sender=qry_veo_phone, message=message_to_veo)
+
         return HttpResponse({"error": False, 'success_msg': "data inserted and processed"})
 
 
@@ -403,7 +453,7 @@ def process_thibitisha_thread(**kwargs):
                         qry_citizen.status = 'VERIFIED'
                         qry_citizen.is_active = 1
                         qry_citizen.verified_at = datetime.now()
-                        qry_citizen.verified_by = citizen.id
+                        qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
                         """TODO: create user profile for login to the platform"""
@@ -435,7 +485,7 @@ def process_thibitisha_thread(**kwargs):
                         qry_citizen.status = 'VERIFIED'
                         qry_citizen.is_active = 1
                         qry_citizen.verified_at = datetime.now()
-                        qry_citizen.verified_by = citizen.id
+                        qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
                         """TODO: create user profile for login to the platform"""
@@ -467,7 +517,7 @@ def process_thibitisha_thread(**kwargs):
                         qry_citizen.status = 'VERIFIED'
                         qry_citizen.is_active = 1
                         qry_citizen.verified_at = datetime.now()
-                        qry_citizen.verified_by = citizen.id
+                        qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
                         """TODO: create user profile for login to the platform"""
@@ -500,7 +550,7 @@ def process_thibitisha_thread(**kwargs):
                             qry_citizen.status = 'PARTIAL'
                             qry_citizen.is_active = 0
                             qry_citizen.verified_at = datetime.now()
-                            qry_citizen.verified_by = citizen.id
+                            qry_citizen.verified_by_id = citizen.id
                             qry_citizen.save()
 
                             """query for MTENDAJI"""
@@ -556,7 +606,7 @@ def process_thibitisha_thread(**kwargs):
 
                         if qry_otp.count() > 0:
                             qry_otp = qry_otp.first()
-                            
+
                             """update otp to invalid"""
                             qry_otp.status = 0
                             qry_otp.save()
@@ -565,7 +615,7 @@ def process_thibitisha_thread(**kwargs):
                             qry_citizen.status = 'VERIFIED'
                             qry_citizen.is_active = 1
                             qry_citizen.verified_at = datetime.now()
-                            qry_citizen.verified_by = citizen.id
+                            qry_citizen.verified_by_id = citizen.id
                             qry_citizen.save()
 
                             """TODO: create user profile for login to the platform"""
