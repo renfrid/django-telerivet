@@ -375,7 +375,7 @@ def process_thibitisha_thread(**kwargs):
     """telerivet wrapper"""
     telerivet = TelerivetWrapper()
 
-    citizen = Citizen.objects.filter(phone__exact=from_number)        
+    citizen = Citizen.objects.filter(phone__exact=from_number)    
 
     message = ""
     if citizen.count() > 0:
@@ -390,9 +390,11 @@ def process_thibitisha_thread(**kwargs):
             if qry_citizen.designation == 'MTENDAJI':
                 if designation == "MTENDAJI_KATA":
                     """query otp"""
-                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1).first()
+                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
-                    if qry_otp: 
+                    if qry_otp.count() > 0:
+                        qry_otp = qry_otp.first()
+
                         """update otp to invalid"""
                         qry_otp.status = 0
                         qry_otp.save()
@@ -420,9 +422,11 @@ def process_thibitisha_thread(**kwargs):
             elif qry_citizen.designation == 'MWENYEKITI':
                 if designation == "MTENDAJI_KATA":
                     """query otp"""
-                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1).first()
+                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
-                    if qry_otp: 
+                    if qry_otp.count() > 0:
+                        qry_otp = qry_otp.first()
+
                         """update otp to invalid"""
                         qry_otp.status = 0
                         qry_otp.save()
@@ -450,9 +454,11 @@ def process_thibitisha_thread(**kwargs):
             elif qry_citizen.designation == 'MJUMBE':
                 if designation == "MTENDAJI" or designation == "MWENYEKITI":
                     """query otp"""
-                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1).first()
+                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
-                    if qry_otp: 
+                    if qry_otp.count() > 0:
+                        qry_otp = qry_otp.first()
+
                         """update otp to invalid"""
                         qry_otp.status = 0
                         qry_otp.save()
@@ -481,9 +487,11 @@ def process_thibitisha_thread(**kwargs):
                 if designation == "MTENDAJI" or designation == "MWENYEKITI" or designation == "MJUMBE":
                     if designation == 'MJUMBE':
                         """query otp"""
-                        qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1).first()
+                        qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
-                        if qry_otp: 
+                        if qry_otp.count() > 0:
+                            qry_otp = qry_otp.first() 
+
                             """update otp to invalid"""
                             qry_otp.status = 0
                             qry_otp.save()
@@ -544,9 +552,11 @@ def process_thibitisha_thread(**kwargs):
                             message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
                     elif designation == 'MTENDAJI' or designation == "MWENYEKITI":
                         """query otp"""
-                        qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1).first()
+                        qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
-                        if qry_otp: 
+                        if qry_otp.count() > 0:
+                            qry_otp = qry_otp.first()
+                            
                             """update otp to invalid"""
                             qry_otp.status = 0
                             qry_otp.save()
