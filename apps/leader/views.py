@@ -7,10 +7,11 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib import messages
-from .forms import LeaderForm
-from apps.citizen.models import Citizen
 from apps.api.registration import RegistrationWrapper
 from apps.api.classes import TelerivetWrapper
+from .forms import LeaderForm
+from apps.citizen.models import Citizen
+from apps.location.models import *
 
 
 class LeaderListView(generic.ListView):
@@ -27,14 +28,40 @@ class LeaderListView(generic.ListView):
         context = super(LeaderListView, self).get_context_data(**kwargs)
         context['title'] = "Leaders"
 
+        context['wards'] = Ward.objects.all()
+
         return context
 
     def get_queryset(self, *args, **kwargs):
         leaders = Citizen.objects.filter(Q(designation="MTENDAJI_KATA") | 
             Q(designation="MTENDAJI") | 
             Q(designation="MWENYEKITI") | 
-            Q(designation="MJUMBE")).order_by('id')
+            Q(designation="MJUMBE"))
 
+        """get variables"""
+        ward_id = self.request.GET.get('ward_id')
+        village_id = self.request.GET.get('village_id')
+        designation = self.request.GET.get('designation')
+        unique_id = self.request.GET.get('unique_id')
+
+        print(self.request.method)
+        print(self.request.GET.get('ward_id'))
+
+        if ward_id:
+            leaders = leaders.filter(ward_id=ward_id)
+
+        if village_id:
+            leaders = leaders.filter(village_id=village_id) 
+
+        if designation:
+            leaders = leaders.filter(designation__exact=designation) 
+
+        if unique_id:
+            leaders = leaders.filter(unique_id__exact=unique_id) 
+
+        leaders = leaders.order_by('id')
+
+        """return leaders"""
         return leaders
 
 

@@ -28,26 +28,116 @@
 <div class="container-xl px-0 mt-4">
     <div class="row">
         <div class="col-xl-12 col-md-12">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
-                {{ message }}
+            <div class="card">
+                <div class="card-body">
+                    <h6>Advanced Search</h6>
+                    <hr />
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="get">
+                        {% csrf_token %}
+                        <div class="row gx-3 mb-3">
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label>Ward</label>
+                                    <select name="ward_id" id="ward_id" class="form-control">
+                                        <option value="">Select</option>
+                                        {% for val in wards %}
+                                        <option value="{{ val.id }}">{{ val.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label>Village</label>
+                                    <select name="village_id" id="village_id" class="form-control">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="font-weight-500">Designation</label>
+                                    <select name="designation" id="designation" class="form-control">
+                                        <option value="">Select</option>
+                                        <option value="MTENDAJI_KATA">MTENDAJI KATA</option>
+                                        <option value="MTENDAJI">MTENDAJI KIJIJI</option>
+                                        <option value="MWENYEKITI">MWENYEKITI</option>
+                                    </select>
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                                <div class="form-group">
+                                    <label class="font-weight-500">Unique ID</label>
+                                    <input type="text" class="form-control" name="unique_id" id="unique_id" placeholder="Enter Unique ID" />
+                                </div>
+                                <!--./form-group -->
+                            </div>
+                            <!--./col-lg-4 -->
+                        </div>
+                        <!--./row -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="text-sm-end">
+                                    <a href="#" class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
+                                    <button class="btn btn-secondary text-medium btn-sm" type="submit">
+                                        Filter
+                                    </button>
+                                </div>
+                                <!--./float-right -->
+                            </div>
+                            <!--./col -->
+                        </div>
+                        <!--./row -->
+                    </form>
+                </div>
             </div>
-            {% endfor %}
-            {% endif %}
+
+            {% if leaders %}
+            <div class="row align-items-center justify-content-between pt-3">
+                <div class="col-auto mb-3">
+                    <div class="font-weight-600 text-large">
+                        {{ leaders.count }} Number of Leaders
+                    </div>
+                </div>
+                <div class="col-12 col-xl-auto mb-3">
+                    <a href="#" class="btn btn-sm btn-success">
+                        <i class="me-1" data-feather="file"></i> Export XLS
+                    </a>
+                </div>
+            </div>
 
             <table id="dt" class="table table-hover table-bordered">
                 <thead>
                     <tr>
                         <th width="3%">#</th>
                         <th width=14%>Full Name</th>
+                        <th width="5%">Gender</th>
                         <th width="10%">Designation</th>
                         <th width="12%">Unique No.</th>
                         <th width="10%">Phone</th>
-                        <th width="6%">Gender</th>
-                        <th width="12%">ID Number</th>
-                        <th width="14%">Location</th>
+                        <th width="12%">Location</th>
+                        <th width="10%">Reg. Date</th>
                         <th width="8%">Status</th>
+                        <th width="10%">Ver. Date</th>
                         <th style="width: 40px;">Action</th>
                     </tr>
                 </thead>
@@ -57,16 +147,15 @@
                     <tr>
                         <td>{{forloop.counter}}</td>
                         <td>{{ val.name }}</td>
+                        <td>{{ val.gender }}</td>
                         <td>{{ val.designation }}</td>
                         <td>{{ val.unique_id }}</td>
                         <td>{{ val.phone }}</td>
-                        <td>{{ val.gender }}</td>
-                        <td>{{ val.id_number|default:"" }}</td>
                         <td>
-                            D: {{val.ward.district.name}}<br />
                             W: {{val.ward.name}}<br />
                             V: {{ val.village.name }}
                         </td>
+                        <td>{{ val.created_at|date:"d-m-Y H:i:s" }}</td>
                         <td>
                             {% if val.status == 'COMPLETED' %}
                                 <label class="badge bg-info">COMPLETED</label>
@@ -76,6 +165,13 @@
                                 <label class="badge bg-success">VERIFIED</label>
                             {% elif val.status == 'PENDING' %}
                                 <label class="badge bg-warning">PENDING</label>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if val.verified_at is not None %}
+                                {{ val.verified_at|date:"d-m-Y H:i:s" }}
+                            {% else %}
+                                N/A
                             {% endif %}
                         </td>
                         <td>
@@ -95,6 +191,11 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% else %}
+                <div class=" mt-4 alert alert-danger">
+                    No any leader found
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
