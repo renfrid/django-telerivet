@@ -464,7 +464,7 @@ def process_thibitisha_thread(**kwargs):
                         telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
 
                         """message"""
-                        message = "Ahsante, uhakiki wa taarifa za mtendaji mwenye namba ya usajili "+qry_citizen.unique_id+ "umekamilika."         
+                        message = "Ahsante, uhakiki wa taarifa za mtendaji mwenye namba ya usajili "+qry_citizen.unique_id+ " umekamilika."         
                     else:
                         message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
                 else:
