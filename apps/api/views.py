@@ -373,7 +373,7 @@ def process_hakiki_thread(**kwargs):
             if qry_citizen.count() > 0:
                 qry_citizen = qry_citizen.first()
 
-                if qry_citizen.status == 'COMPLETED':
+                if qry_citizen.status == 'COMPLETED' or qry_citizen.status == 'PARTIAL':
                     """generate OTP"""
                     otp = registration.generate_pin(pin_size=6)
 
