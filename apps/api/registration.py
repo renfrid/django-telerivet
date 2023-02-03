@@ -27,6 +27,25 @@ class RegistrationWrapper:
             return datetime.strptime(date_in, '%d%m%Y').date() 
 
 
+    def format_id_type(self, **kwargs):
+        """format id type"""
+        id_type = kwargs['id_type']
+
+        if id_type == 'NIDA':
+            label = "NIDA" 
+        elif id_type == 'Leseni ya udereva':
+            label = 'DRIVER LICENCE'
+        elif id_type == 'Passport':
+            label = 'PASSPORT'            
+        elif id_type == 'Kitambulisho cha mpiga kura':
+            label = 'VOTE ID' 
+        elif id_type == 'Sina Kitambulisho':
+            label = "SINA" 
+        else:
+            label = "SINA"      
+
+        return label
+
     def format_gender(self, **kwargs):
         """format gender"""
         gender = kwargs['sex']

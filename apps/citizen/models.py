@@ -43,9 +43,9 @@ class Citizen(models.Model):
     dob               = models.DateField(null=True, blank=True)
     id_type           = models.CharField(max_length=50, choices=ID_TYPE_OPTIONS, blank=True, null=True)
     id_number         = models.CharField(max_length=50, blank=True, null=True)
-    ward              = models.ForeignKey(Ward, related_name="ward", on_delete=models.DO_NOTHING, blank=True, null=True)
-    village           = models.ForeignKey(Village, related_name="village", on_delete=models.DO_NOTHING, blank=True, null=True)
-    neighborhood      = models.ForeignKey(Neighborhood, related_name="neighborhood", on_delete=models.DO_NOTHING, blank=True, null=True)
+    ward              = models.ForeignKey(Ward, related_name="ward", on_delete=models.SET_NULL, blank=True, null=True)
+    village           = models.ForeignKey(Village, related_name="village", on_delete=models.SET_NULL, blank=True, null=True)
+    neighborhood      = models.ForeignKey(Neighborhood, related_name="neighborhood", on_delete=models.SET_NULL, blank=True, null=True)
     shina             = models.CharField(max_length=50, null=True, blank=True)
     hamlet            = models.CharField(max_length=150, blank=True, null=True)
     physical_address  = models.TextField(null=True, blank=True)
@@ -56,9 +56,9 @@ class Citizen(models.Model):
     status            = models.CharField(max_length=20, choices=STATUS_OPTIONS,default='PENDING', blank=True, null=True)
     is_active         = models.IntegerField(default=0, blank=True, null=True)
     verified_at       = models.DateTimeField(null=True, blank=True)
-    verified_by       = models.ForeignKey("self", on_delete=models.CASCADE, related_name="citizen_verify", null=True, blank=True)
+    verified_by       = models.ForeignKey("self", on_delete=models.SET_NULL, related_name="citizen_verify", null=True, blank=True)
     created_at        = models.DateTimeField(auto_now_add=True)
-    updated_by        = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='citizen_user', blank=True, null=True)
+    updated_by        = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='citizen_user', blank=True, null=True)
     updated_at        = models.DateTimeField(auto_now=True) 
 
     class Meta:
@@ -72,8 +72,8 @@ class Citizen(models.Model):
 
 
 class Token(models.Model):
-    verifier = models.ForeignKey(Citizen, related_name="verifier", on_delete=models.DO_NOTHING, blank=True, null=True)
-    client = models.ForeignKey(Citizen, related_name="client", on_delete=models.DO_NOTHING, blank=True, null=True)
+    verifier = models.ForeignKey(Citizen, related_name="verifier", on_delete=models.CASCADE, blank=True, null=True)
+    client = models.ForeignKey(Citizen, related_name="client", on_delete=models.CASCADE, blank=True, null=True)
     otp = models.IntegerField()
     created_at   = models.DateTimeField(auto_now_add=True)
     used_at = models.DateTimeField(auto_now=True, null=True)

@@ -7,9 +7,10 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib import messages
+from apps.api.registration import RegistrationWrapper
+from apps.location.models import *
 from .models import Citizen
 from .forms import CitizenForm
-from apps.api.registration import RegistrationWrapper
 
 
 class CitizenListView(generic.ListView):
@@ -26,10 +27,32 @@ class CitizenListView(generic.ListView):
         context = super(CitizenListView, self).get_context_data(**kwargs)
         context['title'] = "Citizen"
 
+        context['wards'] = Ward.objects.all()
+
         return context
 
     def get_queryset(self, *args, **kwargs):
-        citizens = Citizen.objects.filter(designation="MWANANCHI").order_by('id')
+        citizens = Citizen.objects.filter(designation="MWANANCHI")
+
+        """get variables"""
+        ward_id = self.request.GET.get('ward_id')
+        village_id = self.request.GET.get('village_id')
+        status = self.request.GET.get('status')
+        unique_id = self.request.GET.get('unique_id')
+
+        if ward_id:
+            citizens = citizens.filter(ward_id=ward_id)
+
+        if village_id:
+            citizens = citizens.filter(village_id=village_id) 
+
+        if status:
+            citizens = citizens.filter(status__exact=status) 
+
+        if unique_id:
+            citizens = citizens.filter(unique_id__exact=unique_id) 
+
+        citizens = citizens.order_by('id')
 
         return citizens
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -43,9 +44,6 @@ class LeaderListView(generic.ListView):
         village_id = self.request.GET.get('village_id')
         designation = self.request.GET.get('designation')
         unique_id = self.request.GET.get('unique_id')
-
-        print(self.request.method)
-        print(self.request.GET.get('ward_id'))
 
         if ward_id:
             leaders = leaders.filter(ward_id=ward_id)
@@ -124,6 +122,7 @@ class LeaderCreateView(generic.CreateView):
             dt_leader.created_by = request.user
             dt_leader.is_active = 1
             dt_leader.status = 'VERIFIED'
+            dt_leader.verified_at = datetime.now()
             dt_leader.password = pin
             dt_leader.unique_id = formating.generate_unique_id(designation=designation)
             dt_leader.phone = phone

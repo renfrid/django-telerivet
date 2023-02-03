@@ -90,7 +90,7 @@
                 </div>
                 <!--./row -->
 
-                <div class="row gx-3 mb-3">
+                <div class="row gx-3 mb-3" id="row-work" style="display: none;">
                     <div class="col-md-6">
                         {{ form.work|as_crispy_field }}
                     </div>
@@ -111,17 +111,22 @@
                     </div>
                     <!--./col-lg-6 -->
 
-                    <div class="col-md-3">
+                    <div class="col-md-3" id="col-village" style="display: none;">
                         {{ form.village|as_crispy_field }}
                     </div>
                     <!--./col-lg-6 -->
-                
-                    <div class="col-md-6">
-                        {{ form.shina|as_crispy_field }}
+
+                    <div class="col-md-6" id="col-hamlet" style="display: none;">
+                        {{ form.hamlet|as_crispy_field }}
                     </div>
-                    <!--./col-lg-6 -->
                 </div>
                 <!--./row -->
+
+                <div class="row gx-3 mb-3">
+                    <div class="col-md-6" id="col-shina" style="display: none;">
+                        {{ form.shina|as_crispy_field }}
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-md-12">
@@ -146,4 +151,35 @@
 {% endblock content %}
 
 {% block extra_js %}
+@section('script')
+    <script type="text/javascript">
+    $(document).ready(function() {
+    //on change designation hide some of parameters
+        $('#designation_id').on('change', function (e) {
+            designation_id = $(this).val();
+
+            if (designation_id == "MTENDAJI_KATA") {
+                $('#row-work').css('display', 'none');
+                $('#col-village').css('display', 'none');
+                $('#col-hamlet').css('display', '');
+                $('#col-shina').css('display', 'none');
+            } else if (designation_id == "MTENDAJI") {
+                $('#row-work').css('display', 'none');
+                $('#col-village').css('display', '');
+                $('#col-hamlet').css('display', '');
+                $('#col-shina').css('display', 'none');
+            } else if (designation_id == "MWENYEKITI") {
+                $('#row-work').css('display', '');
+                $('#col-village').css('display', '');
+                $('#col-hamlet').css('display', '');
+                $('#col-shina').css('display', 'none');
+            } else if (designation_id == "MJUMBE") {
+                $('#row-work').css('display', '');
+                $('#col-village').css('display', '');
+                $('#col-hamlet').css('display', '');
+                $('#col-shina').css('display', '');
+            }
+        });
+    });
+    </script>
 {% endblock extra_js %}

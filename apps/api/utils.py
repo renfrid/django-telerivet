@@ -28,6 +28,8 @@ def get_villages(request):
     """menu session"""
     if designation == 'MTENDAJI':
         menu_session = MenuSession.objects.filter(code=messageId, flag='Mtendaji_Kata_Utumishi').first()
+    elif designation == 'MWENYEKITI':
+        menu_session = MenuSession.objects.filter(code=messageId, flag='Mwenyekiti_Kata_Utumishi').first()
     elif designation == 'MJUMBE':
         menu_session = MenuSession.objects.filter(code=messageId, flag='Mjumbe_Kata_Utumishi').first() 
     elif designation == 'MWANANCHI':   

@@ -234,7 +234,7 @@ def create_profile(**kwargs):
         name      = response['arr_data']['name']
         gender    = formating.format_gender(sex=response['arr_data']['sex'])
         dob       = formating.format_date(date_in=response['arr_data']['dob'])
-        id_type   = response['arr_data']['id_type']
+        id_type   = formating.format_id_type(id_type=response['arr_data']['id_type'])
         id_number = response['arr_data']['id_number']
 
         """process PIN"""

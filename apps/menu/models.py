@@ -24,8 +24,8 @@ class Menu(models.Model):
     pull        =  models.IntegerField(default=0, null=False)
     url         =  models.CharField(max_length=50, blank=True, null=True)
     action      =  models.CharField(max_length=20, blank=True, null=True)
-    created_by  =  models.ForeignKey(User, on_delete=models.CASCADE)
-    updated_by  =  models.ForeignKey(User, related_name="updated", blank=True, null=True, on_delete=models.CASCADE)
+    created_by  =  models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    updated_by  =  models.ForeignKey(User, related_name="updated_by", blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         db_table = 'dt_menus'
@@ -51,8 +51,8 @@ class SubMenu(models.Model):
 
 class MenuLink(models.Model):
     menu        =  models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='menu')
-    sub_menu    =  models.ForeignKey(SubMenu, on_delete=models.DO_NOTHING, blank=True, null=True)
-    link        =  models.ForeignKey(Menu, on_delete=models.DO_NOTHING, related_name='link')
+    sub_menu    =  models.ForeignKey(SubMenu, on_delete=models.SET_NULL, blank=True, null=True)
+    link        =  models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='link')
 
     class Meta:
         db_table = 'dt_menu_links'

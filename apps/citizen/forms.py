@@ -32,7 +32,7 @@ class CitizenForm(forms.ModelForm):
             'village': forms.Select(attrs={'class': 'form-control', 'id': 'village_id', 'required':''}),
             'physical_address': forms.TextInput(attrs={'class': 'form-control', 'id': 'title', 'placeholder': 'Write house number...' }),
             'work': forms.TextInput(attrs={'class': 'form-control', 'id': 'work', 'placeholder': 'Write occupation...', }),
-            'hamlet': forms.TextInput(attrs={'class': 'form-control', 'id': 'work', 'placeholder': 'Write neighborhood...', }),
+            'hamlet': forms.TextInput(attrs={'class': 'form-control', 'id': 'work', 'placeholder': 'Write hamlet...', }),
         } 
 
         labels = {
@@ -47,5 +47,5 @@ class CitizenForm(forms.ModelForm):
             'village': 'Village',
             'physical_address': 'House Number',
             'work': 'Occupation',
-            'hamlet': 'Neighborhood',
+            'hamlet': 'Where you live? (Hamlet)',
         }      
