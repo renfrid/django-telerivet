@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from apps.citizen.models import Citizen, Token
+from apps.citizen.models import Citizen, Token, CitizenComment
 from apps.menu.models import *
 from apps.location.models import *
 from .classes import TelerivetWrapper
@@ -92,13 +92,13 @@ def webhook(request):
                 else:
                     message = 'Namba imeshatumika kwa huduma nyingine'              
             elif key.upper() == 'JEMBE':
-                if citizen.designation == 'MWANANCHI':
+                if citizen.designation == 'MWENYEKITI' or citizen.designation == 'MTENDAJI' or citizen.designation == 'MWANANCHI':
                     if citizen.status == 'VERIFIED' and citizen.is_active == 1:
-                        message = 'Hii huduma itakujia hivi karibuni.'
+                        message = process_threads(from_number=from_number, key=key, designation=citizen.designation) 
                     else:
-                        message = 'Umeshajisajili katika mfumo huu. Tafadhali wasiliana na mjumbe wako wa shina au afisa mtendaji wako wa mtaa kwa uhakiki ili uweze kutumia huduma ya JEMBE.'    
+                        message = 'Umeshajisajili katika mfumo huu. Tafadhali wasiliana na mjumbe wako wa shina au afisa mtendaji wako wa mtaa kwa uhakiki ili uweze kutumia huduma ya JEMBE.' 
                 else:
-                    message = 'Huduma hii inatumiwa na mwananchi pekee.'    
+                    message = 'Hauwezi kutumia huduma hii.'    
             else:
                 """split content into piece"""
                 arr_key = key.split(' ', maxsplit=2)
@@ -186,16 +186,38 @@ def process_threads(**kwargs):
 
             """check for action = None"""
             if(data['action'] is not None):
-                if data['action'] == 'create':
-                    """update all menu session"""
-                    m_session.active = 1
-                    m_session.save()
+                """update all menu session"""
+                m_session.active = 1
+                m_session.save()
 
-                    """process data"""
-                    response = telerivet.process_data(uuid=OD_uuid)
-                    my_data = json.loads(response.content)
-                    print(my_data)
+                """process data"""
+                response = telerivet.process_data(uuid=OD_uuid)
+                my_data = json.loads(response.content)
+                print(my_data)
+
+                if data['action'] == 'create':
+                    """create profile"""
                     result = create_profile(phone=from_number, response=my_data)
+
+                elif data['action'] == 'query_remove_jembe':
+                    result = process_jembe_status(phone=from_number, response=my_data, status=0)
+
+                elif data['action'] == 'query_add_jembe':
+                    result = process_jembe_status(phone=from_number, response=my_data, status=1)
+
+                elif data['action'] == 'query_chosen_jembe':
+                    result = list_jembe(phone=from_number, chosen=1)
+                elif data['action'] == 'query_self_jembe':
+                    result = list_jembe(phone=from_number, chosen=0)
+                elif data['action'] == 'query_verify_jembe':
+                    result = process_jembe_verification(phone=from_number,response=my_data,verification=1) 
+                elif data['action'] == 'query_unverify_jembe':
+                    result = process_jembe_verification(phone=from_number,response=my_data,verification=0) 
+                elif data['action'] == 'query_stop_jembe':
+                    result = stop_jembe(phone=from_number)   
+                elif data['action'] == "create_maoni":
+                    result = create_comments(phone=from_number, response=my_data)
+
 
         elif menu_response == 'INVALID_INPUT':
             """invalid input"""
@@ -459,7 +481,7 @@ def process_thibitisha_thread(**kwargs):
                         """TODO: create user profile for login to the platform"""
 
                         """Inform citizen after verification"""
-                        message_to_citizen = "Habari, usajili wako umekamilika. Msimbo wako ni " + qry_citizen.password +"."
+                        message_to_citizen = "Habari, usajili wako umekamilika. Neno lako la siri ni " + qry_citizen.password +"."
                         qry_citizen_phone = qry_citizen.phone
                         telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
 
@@ -491,7 +513,7 @@ def process_thibitisha_thread(**kwargs):
                         """TODO: create user profile for login to the platform"""
 
                         """Inform citizen after verification"""
-                        message_to_citizen = "Habari, usajili wako umekamilika. Msimbo wako ni " + qry_citizen.password +"."
+                        message_to_citizen = "Habari, usajili wako umekamilika.  Neno lako la siri ni " + qry_citizen.password +"."
                         qry_citizen_phone = qry_citizen.phone
                         telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
 
@@ -523,7 +545,7 @@ def process_thibitisha_thread(**kwargs):
                         """TODO: create user profile for login to the platform"""
 
                         """Inform citizen after verification"""
-                        message_to_citizen = "Habari, usajili wako umekamilika. Msimbo wako ni " + qry_citizen.password +"."
+                        message_to_citizen = "Habari, usajili wako umekamilika.  Neno lako la siri ni " + qry_citizen.password +"."
                         qry_citizen_phone = qry_citizen.phone
                         telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
 
@@ -655,7 +677,7 @@ def process_thibitisha_thread(**kwargs):
 
                             """Message to MWANANCHI"""
                             message_to_citizen = "Habari " + qry_citizen.name + ", usajili wako umekamilika. " \
-                                    "Neno siri ni " + qry_citizen.password + "."
+                                    " Neno lako la siri ni " + qry_citizen.password + "."
                             qry_citizen_phone = qry_citizen.phone
 
                             """send message to MWANANCHI"""
@@ -674,6 +696,273 @@ def process_thibitisha_thread(**kwargs):
 
     """return message"""   
     return message   
+
+
+def process_jembe_status(**kwargs):
+    """add or remove be_jembe status"""
+    phone       = kwargs['phone']
+    response    = kwargs['response']
+    status      = kwargs['status']
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+
+    """query for citizen"""
+    citizen = Citizen.objects.filter(phone=phone).first()
+
+    if citizen:
+        params = response['arr_data']['Jembe_Mwenyekiti_Teua']
+        arr_key = params.split(' ', maxsplit=2)
+        unique_id = arr_key[0]
+
+        """query JEMBE data"""
+        qry_citizen = Citizen.objects.filter(unique_id=unique_id, designation="MWANANCHI")
+
+        if qry_citizen.count() > 0:
+            qry_citizen = qry_citizen.first()
+
+            qry_citizen.be_jembe = status
+            qry_citizen.chosen = 1
+            qry_citizen.be_jembe_at = datetime.now()
+            qry_citizen.be_jembe_by_id = citizen.id               
+            qry_citizen.save()
+
+            """Create custom message to Send to MKITI and MTENDAJI"""
+            if status == 0:
+                message_to_mkiti = "Mwananchi mwenye namba " + unique_id + " ameondolewa kama kuwa JEMBE katika kijiji cha " + qry_citizen.village.name
+            elif status == 1:
+                message_to_mkiti = "Mwananchi mwenye namba " + unique_id + " ameteuliwa kama kuwa JEMBE katika kijiji cha " + qry_citizen.village.name    
+
+            """Send SMS to M|KITI"""
+            telerivet.send_message(sender=phone, message=message_to_mkiti)
+            
+            """Send SMS to MTENDAJI"""
+            """query for MTENDAJI"""
+            qry_veo = Citizen.objects.filter(village_id=qry_citizen.village_id, is_active=1, designation="MTENDAJI")
+
+            if qry_veo.count() > 0:
+                """VEO data"""
+                qry_veo = qry_veo.last()
+                qry_veo_phone = qry_veo.phone
+
+                """send SMS"""
+                telerivet.send_message(sender=qry_veo_phone, message=message_to_mkiti)
+
+            """Send SMS to JEMBE"""
+            if status == 0:
+                message_to_jembe = "Umeondolewa kama JEMBE katika kijiji cha " + qry_citizen.village.name 
+            elif status == 1:
+                message_to_jembe = "Umeteuliwa kama JEMBE katika kijiji cha " + qry_citizen.village.name
+
+            """send SMS"""
+            telerivet.send_message(sender=qry_citizen.phone, message=message_to_jembe) 
+
+            """response"""
+            return HttpResponse({"error": False, 'success_msg': "data inserted and processed"})
+
+
+def process_jembe_verification(**kwargs):
+    """verify or unverify jembe"""
+    phone    = kwargs['phone']
+    response = kwargs['response']
+    verification = kwargs['verification']
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+
+    """query for citizen"""
+    citizen = Citizen.objects.filter(phone=phone).first()
+
+    if citizen:
+        params = response['arr_data']['Jembe_Mtendaji_Teua']
+        arr_key = params.split(' ', maxsplit=2)
+        unique_id = arr_key[0]
+
+        """query JEMBE data"""
+        qry_citizen = Citizen.objects.filter(unique_id=unique_id, designation="MWANANCHI")
+
+        if qry_citizen.count() > 0:
+            qry_citizen = qry_citizen.first()
+
+            qry_citizen.verified_jembe = verification
+            qry_citizen.verified_jembe_at = datetime.now()
+            qry_citizen.verified_jembe_by_id = citizen.id               
+            qry_citizen.save()
+
+            """Create custom message to Send to MKITI and MTENDAJI"""
+            if verification == 0:
+                message_to_mkiti = "Mwananchi mwenye namba " + unique_id + " amethibitishwa kuondolewa kama kuwa JEMBE katika kijiji cha " + qry_citizen.village.name
+            elif verification == 1:
+                message_to_mkiti = "Mwananchi mwenye namba " + unique_id + " amethibitishwa kuteuliwa kama kuwa JEMBE katika kijiji cha " + qry_citizen.village.name    
+
+            """Send SMS to M|KITI"""
+            telerivet.send_message(sender=phone, message=message_to_mkiti)
+            
+            """Send SMS to MTENDAJI"""
+            """query for MTENDAJI"""
+            qry_veo = Citizen.objects.filter(village_id=qry_citizen.village_id, is_active=1, designation="MTENDAJI")
+
+            if qry_veo.count() > 0:
+                """VEO data"""
+                qry_veo = qry_veo.last()
+                qry_veo_phone = qry_veo.phone
+
+                """send SMS"""
+                telerivet.send_message(sender=qry_veo_phone, message=message_to_mkiti)
+
+            """Send SMS to JEMBE"""
+            if verification == 0:
+                message_to_jembe = "Umethibitishwa kuondolewa kama JEMBE katika kijiji cha " + qry_citizen.village.name 
+            elif verification == 1:
+                message_to_jembe = "Umethibitishwa kuteuliwa kama JEMBE katika kijiji cha " + qry_citizen.village.name
+
+            """send SMS"""
+            telerivet.send_message(sender=qry_citizen.phone, message=message_to_jembe) 
+
+            """response"""
+            return HttpResponse({"error": False, 'success_msg': "data inserted and processed"})
+
+
+def list_jembe(**kwargs):
+    """list chosen and self jembe"""
+    phone         = kwargs['phone']
+    chosen        = kwargs['chosen']
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+
+    """query citizen"""
+    citizen = Citizen.objects.filter(phone=phone).first()
+    village_id = citizen.village_id
+
+    """query for JEMBE"""
+    qry_citizens = Citizen.objects.filter(village_id=village_id, be_jembe=1, chosen=chosen)
+
+    message = ""
+    if qry_citizens.count() > 0:
+        serial = 1
+        for val in qry_citizens:
+            message += "Jembe Namba:" + serial  +"\n" \
+                        "Namba: "+ str(val.unique_id) +"\n" \
+                            "Jina: "+ val.name +"\n" \
+                                "Simu: " +val.phone +"\n" \
+                                        "Kitambulisho: " + val.id_type+"\n" \
+                                            "Kitamb. Namba: "+ val.id_number+"\n"\
+                                                "Kata: " + val.ward.name+"\n" \
+                                                    "Mtaa/Kijiji: "+ val.village.name+"\n" \
+                                                        "Kitongoji: " + val.hamlet + "\n"
+            serial +=serial
+    else:
+        if chosen == 1:
+            message += "Hakuna Jembe aliyeteuliwa" 
+        elif chosen == 0:
+            message += "Hakuna Jembe aliyejitolea" 
+
+    telerivet.send_message(sender=phone, message=message)    
+
+    """response"""
+    return HttpResponse({"error": False, 'success_msg': "SMS sent"})   
+
+
+def stop_jembe(**kwargs):
+    """Stop using JEMBE: this action done by MWANANCHI"""
+    phone    = kwargs['phone']
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+
+    """query for citizen"""
+    qry_citizen = Citizen.objects.filter(phone=phone)
+
+    if qry_citizen.count() > 0:
+        qry_citizen = qry_citizen.first()
+
+        qry_citizen.be_jembe = 0
+        qry_citizen.verified_jembe = 0
+        qry_citizen.be_jembe_at = datetime.now()
+        qry_citizen.be_jembe_by_id = qry_citizen.id               
+        qry_citizen.save()
+
+        """Create custom message to Send to MKITI and MTENDAJI"""
+        message_to_mkiti = "Mwananchi mwenye namba " + qry_citizen.unique_id + " amejitoa kuwa JEMBE katika kijiji cha " + qry_citizen.village.name    
+
+        """Send SMS to M|KITI"""
+        telerivet.send_message(sender=phone, message=message_to_mkiti)
+        
+        """Send SMS to MTENDAJI"""
+        qry_veo = Citizen.objects.filter(village_id=qry_citizen.village_id, is_active=1, designation="MTENDAJI")
+
+        if qry_veo.count() > 0:
+            """VEO data"""
+            qry_veo = qry_veo.last()
+            qry_veo_phone = qry_veo.phone
+
+            """send SMS"""
+            telerivet.send_message(sender=qry_veo_phone, message=message_to_mkiti)
+
+        """Send SMS to JEMBE"""
+        message_to_jembe = "Umefanikiwa kujitoa kama JEMBE katika kijiji cha " + qry_citizen.village.name
+
+        """send SMS"""
+        telerivet.send_message(sender=qry_citizen.phone, message=message_to_jembe) 
+
+        """response"""
+        return HttpResponse({"error": False, 'success_msg': "data inserted and processed"})
+
+
+
+def create_comments(**kwargs):
+    """Create maoni for JEMBE"""
+    phone       = kwargs['phone']
+    response    = kwargs['response']
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+
+    """query for citizen"""
+    citizen = Citizen.objects.filter(phone=phone).first()
+
+    if citizen:
+        params = response['arr_data']['Jembe_Comment']
+
+        arr_key = params.split(' ', maxsplit=2)
+        unique_id = arr_key[0]
+
+        """query JEMBE data"""
+        qry_citizen = Citizen.objects.filter(unique_id=unique_id, designation="MWANANCHI")
+
+        if qry_citizen.count() > 0:
+            qry_citizen = qry_citizen.first()
+
+            """create comments"""
+            new_comment = CitizenComment
+            new_comment.type = response['arr_data']['Jembe_Comment_Type']
+            new_comment.comments = response['arr_data']['Jembe_Comment_Text']
+            new_comment.created_by_id = citizen.id
+            new_comment.created_at =datetime.now()
+            new_comment.save()
+
+            """Create custom message to Send to MKITI and MTENDAJI"""
+            message_to_mkiti = "Mwananchi mwenye namba " + unique_id + " amekusanya maoni"
+
+            """Send SMS to M|KITI"""
+            telerivet.send_message(sender=phone, message=message_to_mkiti)
+            
+            """Send SMS to MTENDAJI"""
+            qry_veo = Citizen.objects.filter(village_id=qry_citizen.village_id, is_active=1, designation="MTENDAJI")
+
+            if qry_veo.count() > 0:
+                """VEO data"""
+                qry_veo = qry_veo.last()
+                qry_veo_phone = qry_veo.phone
+
+                """send SMS"""
+                telerivet.send_message(sender=qry_veo_phone, message=message_to_mkiti) 
+
+            """response"""
+            return HttpResponse({"error": False, 'success_msg': "data inserted and processed"})
+
+
 
 
 

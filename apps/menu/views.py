@@ -52,7 +52,7 @@ class MenuDetailView(generic.DetailView):
         context = super(MenuDetailView, self).get_context_data(**kwargs)
         context['title'] = "Menu"
 
-        sub_menu = SubMenu.objects.filter(menu_id=self.kwargs['pk'])
+        sub_menu = SubMenu.objects.filter(menu_id=self.kwargs['pk']).order_by('view_id')
         context['sub_menu'] = sub_menu
         return context
 
@@ -144,7 +144,7 @@ class MenuLinkListView(generic.ListView):
         context = super(MenuLinkListView, self).get_context_data(**kwargs)
         context['title'] = "Menu Links"
         context['keyword'] = Keyword.objects.all()
-        context['menu'] = Menu.objects.filter(keyword_id=1).order_by('step')
+        context['menu'] = Menu.objects.filter(keyword_id=7).order_by('step')
 
         menu_links = MenuLink.objects.all().order_by("menu__keyword__id", "menu__step")
         context['menu_links'] = menu_links
@@ -192,7 +192,7 @@ def get_menu_lists(request, *args, **kwargs):
 def get_sub_menu_lists(request, *args, **kwargs):
     if request.method == 'GET':
         menu_id = kwargs['menu_id']
-        sub_menu = SubMenu.objects.filter(menu_id=menu_id)
+        sub_menu = SubMenu.objects.filter(menu_id=menu_id).order_by('view_id')
 
         # return response.
         return render(None, 'menu/sub_menu.html', {'sub_menu': sub_menu})

@@ -51,6 +51,12 @@ class Citizen(models.Model):
     physical_address  = models.TextField(null=True, blank=True)
     work              = models.CharField(max_length=50, blank=True, null=True)
     be_jembe          = models.IntegerField(null=True, blank=True, default=0)
+    chosen            = models.IntegerField(null=True, blank=True, default=0)
+    be_jembe_at       = models.DateTimeField(null=True, blank=True)
+    be_jembe_by       = models.ForeignKey("self", on_delete=models.SET_NULL, related_name="jembe_user", null=True, blank=True)
+    verified_jembe    = models.IntegerField(null=True, blank=True, default=0)
+    verified_jembe_at = models.DateTimeField(null=True, blank=True)
+    verified_jembe_by = models.ForeignKey("self", on_delete=models.SET_NULL, related_name="verified_jembe_user", null=True, blank=True)
     password          = models.CharField(max_length=20, blank=True, null=True)
     step              = models.IntegerField(default=1, blank=True, null=True)
     status            = models.CharField(max_length=20, choices=STATUS_OPTIONS,default='PENDING', blank=True, null=True)
@@ -69,6 +75,30 @@ class Citizen(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class CitizenComment(models.Model):
+    COMMENT_TYPES_OPTIONS = (
+        ("SIRI", 'Siri'),
+        ("WAZI", 'Wazi'),
+    )
+
+    citizen      = models.ForeignKey(Citizen, related_name="citizen_comment", on_delete=models.CASCADE, blank=False, null=False)
+    type         = models.CharField(max_length=50, choices=COMMENT_TYPES_OPTIONS, blank=False, null=False) 
+    comments     = models.TextField(null=False, blank=False)
+    created_by   = models.ForeignKey(Citizen, related_name="creator", on_delete=models.SET_NULL, blank=True, null=True) 
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table     = 'dt_citizen_comments'
+        managed      = True
+        verbose_name = 'Citizen Comment'
+        verbose_name_plural = 'Citizens Comments'
+
+    def __str__(self):
+        return str(self.name)
+
+
 
 
 class Token(models.Model):

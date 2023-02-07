@@ -45,7 +45,14 @@ class TelerivetWrapper:
         elif key.upper() == 'MJUMBE':
             menu = Menu.objects.get(flag="Mjumbe_Name")
         elif key.upper() == 'MWANANCHI':
-            menu = Menu.objects.get(flag='Mwananchi_Name')    
+            menu = Menu.objects.get(flag='Mwananchi_Name')
+        elif key.upper() == 'JEMBE':
+            if designation == 'MWENYEKITI':
+                menu = Menu.objects.get(flag="Jembe_Mwenyekiti_Mwanzo")
+            elif designation == 'MTENDAJI':
+                pass    
+            elif designation == 'MWANANCHI':
+                pass  
 
         """random code"""
         uuid = ''.join(random.choices(string.ascii_uppercase, k=12))
@@ -244,6 +251,50 @@ class TelerivetWrapper:
             if menu_session:
                 message = message.replace("ID_Number", menu_session.values)
 
+        if menu.flag == 'Jembe_Mwenyekiti_Teua_Qn' or menu.flag == 'Jembe_Mwenyekiti_Ondoa_Qn' \
+             or menu.flag == 'Jembe_Mtendaji_Teua_Qn' or menu.flag == 'Jembe_Mtendaji_Ondoa_Qn' \
+                or menu.flag == 'Jembe_Mwenyekiti_Maoni_Aina' or menu.flag == 'Jembe_Mtendaji_Maoni_Aina' or menu.flag == 'Jembe_Mwananchi_Maoni_Aina':
+            if menu.flag == 'Jembe_Mwenyekiti_Teua_Qn':
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mwenyekiti_Teua", phone=phone).last() 
+
+            elif menu.flag == 'Jembe_Mwenyekiti_Ondoa_Qn': 
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mwenyekiti_Ondoa", phone=phone).last() 
+
+            elif menu.flag == 'Jembe_Mtendaji_Teua_Qn':
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mtendaji_Teua", phone=phone).last() 
+
+            elif menu.flag == 'Jembe_Mtendaji_Ondoa_Qn':
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mtendaji_Ondoa", phone=phone).last() 
+
+            elif menu.flag == 'Jembe_Mwenyekiti_Maoni_Aina':
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mwenyekiti_Maoni", phone=phone).last() 
+
+            elif menu.flag == 'Jembe_Mtendaji_Maoni_Aina':
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mtendaji_Maoni", phone=phone).last()
+
+            elif menu.flag == 'Jembe_Mwananchi_Maoni_Aina':
+                menu_session =  MenuSession.objects.filter(flag="Jembe_Mwananchi_Maoni", phone=phone).last()
+
+            """Split values"""
+            values = menu_session.values
+            arr_key = values.split(' ', maxsplit=2)
+
+            unique_id = arr_key[0]
+            pin = arr_key[1]
+
+            """verify pin"""
+            qry_citizen = Citizen.objects.filter(phone=phone, password=pin)
+
+            if qry_citizen.count() > 0:
+                """query JEMBE data"""
+                jembe_data = self.get_citizen_data(unique_id=unique_id,designation="MWANANCHI")
+                message = message.replace("Jembe_Data", jembe_data)
+            else:
+                jembe_data = "Umekosea neno siri!"  
+                message = message.replace("Jembe_Data", jembe_data) 
+                 
+
+        """Finalizing thread"""
         if menu.pull == 1:
             """Construct URL"""
             URL = self.BASE_URL + menu.url
@@ -342,4 +393,36 @@ class TelerivetWrapper:
             return JsonResponse({'status': 'success', 'arr_data': arr_data})
         else:
             return JsonResponse({'status': 'failed', 'error_msg': 'No any data!'})
+            
+
+    def get_citizen_data(self, **kwargs):
+        """Get citizen data"""
+        qry_data = ""
+
+        """args"""
+        uuid   = kwargs["unique_id"]
+        desgn  = kwargs["designation"]
+
+        """query citizen"""
+        qry_citizen = Citizen.objects.filter(unique_id=uuid, designation=desgn)
+
+
+        if qry_citizen.count() > 0:
+            qry_citizen = qry_citizen.first()
+
+            """message"""
+            qry_data = "Taarifa za jembe:\n" \
+                "Namba: "+ str(qry_citizen.unique_id) +"\n" \
+                    "Jina: "+ qry_citizen.name +"\n" \
+                        "Simu: " +qry_citizen.phone +"\n" \
+                                "Kitambulisho: " + qry_citizen.id_type+"\n" \
+                                    "Kitamb. Namba: "+ qry_citizen.id_number+"\n"\
+                                        "Kata: " + qry_citizen.ward.name+"\n" \
+                                            "Mtaa/Kijiji: "+ qry_citizen.village.name+"\n" \
+                                                "Kitongoji: " + qry_citizen.hamlet + "\n"
+        else:
+            qry_data = "Hakuna mwananchi mwenye namba " + uuid                                      
+
+
+        return qry_data                                        
             
