@@ -14,8 +14,8 @@ import telerivet
 
 
 class TelerivetWrapper:
-    #BASE_URL   = "http://127.0.0.1:8001/"
-    BASE_URL   = "http://jinadi.happen.co.tz/"
+    #BASE_URL   = "http://127.0.0.1:8000/"
+    BASE_URL   = "https://jinadi.happen.co.tz/"
     API_TOKEN  = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     # API_KEY = 'ZaCNa_cgefsjQ3eDLQ8JH33RvMuQ1qQmTT2h'
     API_KEY = 'c7fAkAuMy8a6aUZQWyNNyYXSutXuszcV'
@@ -50,9 +50,9 @@ class TelerivetWrapper:
             if designation == 'MWENYEKITI':
                 menu = Menu.objects.get(flag="Jembe_Mwenyekiti_Mwanzo")
             elif designation == 'MTENDAJI':
-                pass    
+                menu = Menu.objects.get(flag="Jembe_Mtendaji_Mwanzo")    
             elif designation == 'MWANANCHI':
-                pass  
+                menu = Menu.objects.get(flag="Jembe_Mwananchi_Mwanzo")  
 
         """random code"""
         uuid = ''.join(random.choices(string.ascii_uppercase, k=12))
