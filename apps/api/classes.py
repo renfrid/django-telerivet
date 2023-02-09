@@ -51,7 +51,7 @@ class TelerivetWrapper:
                 menu = Menu.objects.get(flag="Jembe_Mwenyekiti_Mwanzo")
             elif designation == 'MTENDAJI':
                 menu = Menu.objects.get(flag="Jembe_Mtendaji_Mwanzo")    
-            elif designation == 'MWANANCHI':
+            elif designation == 'MWANANCHI' or designation == 'MJUMBE':
                 menu = Menu.objects.get(flag="Jembe_Mwananchi_Mwanzo")  
 
         """random code"""

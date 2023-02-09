@@ -52,7 +52,7 @@ def webhook(request):
                     elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
                         message = 'Samahani, namba ya usajili ya mtendaji imeshahakikiwa au imesitishwa.'
                     elif citizen.status == 'PENDING':
-                        message = process_threads(from_number=from_number, key=key, designation=citizen.designation)   
+                        message = init_thread(from_number=from_number, key=key, designation=citizen.designation)   
                 else:
                     message = 'Namba imeshatumika kwa huduma nyingine'
             elif key.upper() == 'MWENYEKITI':
@@ -64,7 +64,7 @@ def webhook(request):
                     elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
                         message = 'Samahani, namba ya usajili ya mtendaji imeshahakikiwa au imesitishwa.'
                     elif citizen.status == 'PENDING':
-                        message = process_threads(from_number=from_number, key=key, designation=citizen.designation)   
+                        message = init_thread(from_number=from_number, key=key, designation=citizen.designation)   
                 else:
                     message = 'Namba imeshatumika kwa huduma nyingine'
             elif key.upper() == 'MJUMBE':
@@ -76,7 +76,7 @@ def webhook(request):
                     elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
                         message = 'Samahani, namba ya usajili ya mjumbe imeshahakikiwa au imesitishwa.'
                     elif citizen.status == 'PENDING':
-                        message = process_threads(from_number=from_number, key=key, designation=citizen.designation)   
+                        message = init_thread(from_number=from_number, key=key, designation=citizen.designation)   
                 else:
                     message = 'Namba imeshatumika kwa huduma nyingine'
             elif key.upper() == 'MWANANCHI':
@@ -88,17 +88,24 @@ def webhook(request):
                     elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
                         message = 'Samahani, akaunti yako imesitishwa. Tafadhali wasiliana na mtendaji wa mtaa wako kurudisha akaunti yako.'
                     elif citizen.status == 'PENDING':
-                        message = process_threads(from_number=from_number, key=key, designation=citizen.designation)   
+                        message = init_thread(from_number=from_number, key=key, designation=citizen.designation)   
                 else:
                     message = 'Namba imeshatumika kwa huduma nyingine'              
             elif key.upper() == 'JEMBE':
-                if citizen.designation == 'MWENYEKITI' or citizen.designation == 'MTENDAJI' or citizen.designation == 'MWANANCHI':
-                    if citizen.status == 'VERIFIED' and citizen.is_active == 1:
-                        message = process_threads(from_number=from_number, key=key, designation=citizen.designation) 
-                    else:
-                        message = 'Umeshajisajili katika mfumo huu. Tafadhali wasiliana na mjumbe wako wa shina au afisa mtendaji wako wa mtaa kwa uhakiki ili uweze kutumia huduma ya JEMBE.' 
+                if citizen.status == 'VERIFIED' and citizen.is_active == 1:
+                    """update all the session"""
+                    MenuSession.objects.filter(phone=citizen.phone).update(active=1)
+
+                    """init Jembe session"""
+                    message = telerivet.call_init_menu(phone=from_number, key=key, designation=citizen.designation) 
                 else:
-                    message = 'Hauwezi kutumia huduma hii.'    
+                    message = 'Umeshajisajili katika mfumo huu. Tafadhali wasiliana na mjumbe wako wa shina au afisa mtendaji wako wa mtaa kwa uhakiki ili uweze kutumia huduma ya JEMBE.'   
+            elif key.upper() == 'UPYA':
+                """update all the session"""
+                MenuSession.objects.filter(phone=citizen.phone).update(active=1)
+
+                """message"""
+                message = "Sasa unaweza anza upya na huduma unayohitaji!"
             else:
                 """split content into piece"""
                 arr_key = key.split(' ', maxsplit=2)
@@ -131,6 +138,20 @@ def webhook(request):
                             """process THIBITISHA thread"""
                             message = ""
                             message = process_thibitisha_thread(from_number=from_number, otp=otp, unique_id=unique_id, designation=citizen.designation)
+                elif keyword.upper() == 'TENGUA': 
+                    if citizen.status == 'COMPLETED':
+                        message = 'Hauwezi kutumia huduma hii mpaka uwe umethibitishwa na ngazi ya juu. Tafadhali wasiliana na ngazi ya juu kwa uhakiki.'
+                    elif citizen.status == 'VERIFIED' and citizen.is_active == 0:
+                        message = 'Samahani, akaunti yako imesitishwa. Tafadhali wasiliana na ngazi ya juu kurudisha akaunti yako.'
+                    elif citizen.status == 'VERIFIED' and citizen.is_active == 1:
+                        if arr_key[1] is None or arr_key[2] is None:
+                            message = 'Umekosea kutumia huduma ya TENGUA, kutumia huduma hii andika neno TENGUA ikifuatiwa na Namba ya usajili na msimbo uliotumiwa wakati wa HAKIKI. Mfano TENGUA MJB-999-45166 1234'  
+                        else:
+                            unique_id = arr_key[1] 
+                            otp       = arr_key[2] 
+                            """process TENGUA thread"""
+                            message = ""
+                            message = process_tengua_thread(from_number=from_number, otp=otp, unique_id=unique_id, designation=citizen.designation)
                 else:            
                     message = process_threads(from_number=from_number, key=key, designation=citizen.designation)
 
@@ -148,6 +169,35 @@ def webhook(request):
         })) 
 
 
+def init_thread(**kwargs):
+    """process the last thread"""
+    from_number = kwargs['from_number']
+    key         = kwargs['key']
+    designation = kwargs['designation']
+
+    """initiate message"""
+    message = "Welcome to JINADI Project."
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+    
+    """Follow menu session and Trigger follow up menu"""
+    menu_session = MenuSession.objects.filter(phone=from_number, active=0) 
+
+    if menu_session.count() > 0:
+        m_session = MenuSession.objects.filter(phone=from_number, active=0).latest('id')
+
+        """Menu session data"""
+        OD_uuid = m_session.code
+        OD_menu_id = m_session.menu_id
+
+        message = telerivet.process_menu(OD_menu_id, from_number, OD_uuid, designation)
+    else:
+        message = telerivet.call_init_menu(phone=from_number, key=key, designation=designation) 
+
+    return message     
+
+
 def process_threads(**kwargs):
     """process all the threads"""
     from_number = kwargs['from_number']
@@ -155,7 +205,7 @@ def process_threads(**kwargs):
     designation = kwargs['designation']
 
     """initiate message"""
-    message = "Welcome to Bukoba Project."
+    message = "Welcome to JINADI Project."
 
     """telerivet wrapper"""
     telerivet = TelerivetWrapper()
@@ -173,7 +223,7 @@ def process_threads(**kwargs):
             m_session.values = key
             m_session.save()
 
-            """update data if involves JIHAKIKI menu"""
+            """Menu session data"""
             OD_uuid = m_session.code
             OD_menu_id = m_session.menu_id
 
@@ -187,8 +237,7 @@ def process_threads(**kwargs):
             """check for action = None"""
             if(data['action'] is not None):
                 """update all menu session"""
-                m_session.active = 1
-                m_session.save()
+                MenuSession.objects.filter(code=OD_uuid).update(active=1)
 
                 """process data"""
                 response = telerivet.process_data(uuid=OD_uuid)
@@ -438,7 +487,7 @@ def process_hakiki_thread(**kwargs):
 
 
 def process_thibitisha_thread(**kwargs):
-    """process HAKIKI thread """ 
+    """process THIBITISHA thread """ 
     from_number = kwargs['from_number']
     otp         = kwargs['otp']
     unique_id   = kwargs['unique_id']
@@ -697,6 +746,264 @@ def process_thibitisha_thread(**kwargs):
     """return message"""   
     return message   
 
+def process_tengua_thread(**kwargs):
+    """process TENGUA   thread """ 
+    from_number = kwargs['from_number']
+    otp         = kwargs['otp']
+    unique_id   = kwargs['unique_id']
+    designation = kwargs['designation']
+
+    """telerivet wrapper"""
+    telerivet = TelerivetWrapper()
+
+    citizen = Citizen.objects.filter(phone__exact=from_number)    
+
+    message = ""
+    if citizen.count() > 0:
+        citizen = citizen.first()
+
+        """query verified citizen """
+        qry_citizen = Citizen.objects.filter(unique_id__exact=unique_id, ward_id=citizen.ward.id) 
+
+        if qry_citizen.count() > 0:
+            qry_citizen = qry_citizen.first()
+
+            if qry_citizen.designation == 'MTENDAJI':
+                if designation == "MTENDAJI_KATA":
+                    """query otp"""
+                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
+
+                    if qry_otp.count() > 0:
+                        qry_otp = qry_otp.first()
+
+                        """update otp to invalid"""
+                        qry_otp.status = 0
+                        qry_otp.save()
+
+                        """update citizen to UNVERIFIED and ACTIVE=0"""
+                        qry_citizen.status = 'UNVERIFIED'
+                        qry_citizen.is_active = 0
+                        qry_citizen.verified_at = datetime.now()
+                        qry_citizen.verified_by_id = citizen.id
+                        qry_citizen.save()
+
+                        """TODO: update user status"""
+
+                        """Inform citizen after verification"""
+                        message_to_citizen = "Habari, usajili wako umetenguliwa. Wasiliana mtendaji wako."
+                        qry_citizen_phone = qry_citizen.phone
+                        telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
+
+                        """message"""
+                        message = "Ahsante, utenguzi wa taarifa za mtendaji mwenye namba ya usajili "+qry_citizen.unique_id+ " umekamilika."         
+                    else:
+                        message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
+                else:
+                    message = "Samahani, hauna uwezo kumtengua mtendaji wa kijiji."
+            elif qry_citizen.designation == 'MWENYEKITI':
+                if designation == "MTENDAJI_KATA":
+                    """query otp"""
+                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
+
+                    if qry_otp.count() > 0:
+                        qry_otp = qry_otp.first()
+
+                        """update otp to invalid"""
+                        qry_otp.status = 0
+                        qry_otp.save()
+
+                        """update citizen to UNVERIFIED and ACTIVE=0"""
+                        qry_citizen.status = 'UNVERIFIED'
+                        qry_citizen.is_active = 0
+                        qry_citizen.verified_at = datetime.now()
+                        qry_citizen.verified_by_id = citizen.id
+                        qry_citizen.save()
+
+                        """TODO: update user status"""
+
+                        """Inform citizen after verification"""
+                        message_to_citizen = "Habari, usajili wako umetenguliwa. Wasiliana mtendaji wako."
+                        qry_citizen_phone = qry_citizen.phone
+                        telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
+
+                        """message"""
+                        message = "Ahsante, utenguzi wa taarifa za mwenyekiti mwenye namba ya usajili "+qry_citizen.unique_id+ " umekamilika."         
+                    else:
+                        message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
+                else:
+                    message = "Samahani, hauna uwezo kumtengua mwenyekiti wa kijiji."
+            elif qry_citizen.designation == 'MJUMBE':
+                if designation == "MTENDAJI" or designation == "MWENYEKITI":
+                    """query otp"""
+                    qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
+
+                    if qry_otp.count() > 0:
+                        qry_otp = qry_otp.first()
+
+                        """update otp to invalid"""
+                        qry_otp.status = 0
+                        qry_otp.save()
+
+                        """update citizen to UNVERIFIED and ACTIVE=0"""
+                        qry_citizen.status = 'UNVERIFIED'
+                        qry_citizen.is_active = 0
+                        qry_citizen.verified_at = datetime.now()
+                        qry_citizen.verified_by_id = citizen.id
+                        qry_citizen.save()
+
+                        """TODO: update user status"""
+
+                        """Inform citizen after verification"""
+                        message_to_citizen = "Habari, usajili wako umetenguliwa. Wasiliana mtendaji wako."
+                        qry_citizen_phone = qry_citizen.phone
+                        telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
+
+                        """message"""
+                        message = "Ahsante, utenguzi wa taarifa za mjumbe mwenye namba ya usajili "+qry_citizen.unique_id+ " umekamilika."        
+                    else:
+                        message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
+                else:
+                    message = "Samahani, hauna uwezo kumtengua mjumbe wa kijiji."
+            elif qry_citizen.designation == 'MWANANCHI':
+                if designation == "MTENDAJI" or designation == "MWENYEKITI" or designation == "MJUMBE":
+                    if designation == 'MJUMBE':
+                        """query otp"""
+                        qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
+
+                        if qry_otp.count() > 0:
+                            qry_otp = qry_otp.first() 
+
+                            """update otp to invalid"""
+                            qry_otp.status = 0
+                            qry_otp.save()
+
+                            """update citizen to PARTIAL and ACTIVE=0"""
+                            qry_citizen.status = 'PARTIAL'
+                            qry_citizen.is_active = 0
+                            qry_citizen.verified_at = datetime.now()
+                            qry_citizen.verified_by_id = citizen.id
+                            qry_citizen.save()
+
+                            """query for MTENDAJI"""
+                            qry_veo = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MTENDAJI")
+
+                            if qry_veo.count() > 0:
+                                """VEO data"""
+                                qry_veo = qry_veo.last()
+                                qry_veo_phone = qry_veo.phone
+                                qry_veo_name = qry_veo.name
+
+                                """message to VEO"""
+                                message_to_veo = "Habari "+ qry_veo_name+", mjumbe wako "+ citizen.name + " " \
+                                            "amekamilisha utenguzi wa awali wa mwananchi" \
+                                                "mwenye namba za usajili "+ qry_citizen.unique_id 
+
+                                """send message to VEO"""
+                                telerivet.send_message(sender=qry_veo_phone, message=message_to_veo)
+
+                            """query for Mwenyekiti"""
+                            qry_mwenyekiti = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MWENYEKITI")
+
+                            if qry_mwenyekiti.count() > 0:
+                                """MWENYEKITI data"""
+                                qry_mwenyekiti = qry_mwenyekiti.last()
+                                qry_mwenyekiti_phone = qry_mwenyekiti.phone
+                                qry_mwenyekiti_name = qry_mwenyekiti.name
+
+                                """message to MWENYEKITI"""
+                                message_to_mwenyekiti = "Habari "+ qry_mwenyekiti_name+", mjumbe wako "+ citizen.name + " " \
+                                            "amekamilisha utenguzi wa awali wa mwananchi" \
+                                                "mwenye namba za usajili "+ qry_citizen.unique_id 
+
+                                """send message to MWENYEKITI"""
+                                telerivet.send_message(sender=qry_mwenyekiti_phone, message=message_to_mwenyekiti)
+
+                            """Message to MWANANCHI"""
+                            message_to_citizen = "Habari "+ qry_citizen.name+", utenguzi wa awali wa taarifa zako umekamilika. " \
+                                            "Tafadhali wasiliana na ofisi ya afisa mjumbe wako kukuhakiki tena."
+
+                            qry_citizen_phone = qry_citizen.phone
+
+                            """send message to MWANANCHI"""
+                            telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
+
+                            """message to MJUMBE after PARTIAL verification"""
+                            message = "Ahsante "+ citizen.name +", utenguzi wa awali wa taarifa za mwananchi mwenye namba ya usajili "+ qry_citizen.unique_id+" umekamilika."        
+                        else:
+                            message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
+                    elif designation == 'MTENDAJI' or designation == "MWENYEKITI":
+                        """query otp"""
+                        qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
+
+                        if qry_otp.count() > 0:
+                            qry_otp = qry_otp.first()
+
+                            """update otp to invalid"""
+                            qry_otp.status = 0
+                            qry_otp.save()
+
+                            """update citizen to UNVERIFIED and ACTIVE=0"""
+                            qry_citizen.status = 'UNVERIFIED'
+                            qry_citizen.is_active = 0
+                            qry_citizen.verified_at = datetime.now()
+                            qry_citizen.verified_by_id = citizen.id
+                            qry_citizen.save()
+
+                            """TODO: update user"""
+
+                            """query for Mwenyekiti"""
+                            qry_mwenyekiti = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MWENYEKITI")
+
+                            if qry_mwenyekiti.count() > 0:
+                                """MWENYEKITI data"""
+                                qry_mwenyekiti = qry_mwenyekiti.last()
+                                qry_mwenyekiti_phone = qry_mwenyekiti.phone
+                                qry_mwenyekiti_name = qry_mwenyekiti.name
+
+                                """message to MWENYEKITI"""
+                                message_to_mwenyekiti = "Habari "+ qry_mwenyekiti_name+", " \
+                                            "utenguzi wa mwananchi mwenye namba ya utambulisho "+ qry_citizen.unique_id +" umekamilika."
+
+                                """send message to MWENYEKITI"""
+                                telerivet.send_message(sender=qry_mwenyekiti_phone, message=message_to_mwenyekiti)
+
+                            """Message to MJUMBE"""
+                            qry_mjumbe = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MJUMBE")
+
+                            if qry_mjumbe.count() > 0:
+                                """MJUMBE data"""
+                                qry_mjumbe = qry_mjumbe.last()
+                                qry_mjumbe_phone = qry_mjumbe.phone
+                                qry_mjumbe_name = qry_mjumbe.name
+
+                                """message to MJUMBE"""
+                                message_to_mjumbe = "Habari "+ qry_mjumbe_name+", " \
+                                            "utenguzi wa mwananchi mwenye namba ya utambulisho "+ qry_citizen.unique_id +" umekamilika."
+
+                                """send message to MJUMBE"""
+                                telerivet.send_message(sender=qry_mjumbe_phone, message=message_to_mjumbe)
+
+
+                            """Message to MWANANCHI"""
+                            message_to_citizen = "Habari " + qry_citizen.name + ", umetenguliwa kutumia huduma zote za JINADI. " 
+
+                            """send message to MWANANCHI"""
+                            telerivet.send_message(sender=qry_citizen_phone, message=message_to_citizen)
+
+                            """message to MTENDAJI"""
+                            message = "Ahsante "+ citizen.name + ", utenguzi wa mwananchi mwenye namba ya utambulisho "+ qry_citizen.unique_id +" umekamilika."         
+                        else:
+                            message = "Samahani, umekosea msimbo au msimbo wako umeshatumika."
+                else:
+                    message = "Samahani, hauna uwezo kumtengua mwananchi."
+        else:
+            message = "Samahani, taarifa zako hazijakimilika" 
+    else:
+        message = "Samahani, namba ya siri uliyoingiza sio sahihi. Hakikisha umeingiza tarakimu 4 tu." 
+
+    """return message"""   
+    return message
+
 
 def process_jembe_status(**kwargs):
     """add or remove be_jembe status"""
@@ -842,7 +1149,7 @@ def list_jembe(**kwargs):
     if qry_citizens.count() > 0:
         serial = 1
         for val in qry_citizens:
-            message += "Jembe Namba:" + serial  +"\n" \
+            message += "Jembe Namba:" + str(serial)  +"\n" \
                         "Namba: "+ str(val.unique_id) +"\n" \
                             "Jina: "+ val.name +"\n" \
                                 "Simu: " +val.phone +"\n" \
@@ -935,7 +1242,8 @@ def create_comments(**kwargs):
             qry_citizen = qry_citizen.first()
 
             """create comments"""
-            new_comment = CitizenComment
+            new_comment = CitizenComment()
+            new_comment.citizen_id = qry_citizen.id
             new_comment.type = response['arr_data']['Jembe_Comment_Type']
             new_comment.comments = response['arr_data']['Jembe_Comment_Text']
             new_comment.created_by_id = citizen.id
