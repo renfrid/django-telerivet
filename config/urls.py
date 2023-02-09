@@ -26,6 +26,7 @@ urlpatterns = [
     path('setup/', include('apps.menu.urls')),
     path('citizens/', include('apps.citizen.urls')),
     path('leaders/', include('apps.leader.urls')),
+    path('users/', include('apps.users.urls')),
     path('location/', include('apps.location.urls')),
 
     #apis

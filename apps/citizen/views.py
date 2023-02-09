@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
 from apps.account.models import Profile
+from django.contrib.auth.models import User, Group
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -104,13 +105,37 @@ class CitizenCreateView(generic.CreateView):
         formating = RegistrationWrapper()
 
         if form.is_valid():
+            name = request.POST.get('name')
+            pin  = formating.generate_pin(pin_size=4)
+            phone = formating.format_phone(phone=request.POST.get('phone'))
+
+            """generate unique number"""
+            unique_id = formating.generate_unique_id(designation="MWANANCHI")
+
+            """create user before update citizen"""
+            arr_name = name.split(' ', maxsplit=2)
+            first_name = arr_name[0]
+            email = f'{first_name}@jinadi.co.tz'
+
+            """default role"""
+            role = Group.objects.get(name='citizen')
+
+            """register user"""
+            user = User.objects.create_user(username=unique_id, email=email, password=pin)
+            user.first_name = first_name
+            user.is_active = True
+            user.groups.add(role)
+            user.save()
+
             dt_citizen = form.save(commit=False)
-            dt_citizen.created_by = request.user
-            dt_citizen.designation = "MWANANCHI"
-            dt_citizen.is_active = 1
-            dt_citizen.status = 'VERIFIED'
-            dt_citizen.password = formating.generate_pin(pin_size=4)
-            dt_citizen.unique_id = formating.generate_unique_id(designation="MWANANCHI")
+            dt_citizen.user_id      = user.id
+            dt_citizen.created_by   = request.user
+            dt_citizen.designation  = "MWANANCHI"
+            dt_citizen.is_active    = 1
+            dt_citizen.status       = 'VERIFIED'
+            dt_citizen.password     = pin
+            dt_citizen.unique_id    = unique_id
+            dt_citizen.phone        = phone
             dt_citizen.save()
 
             messages.success(request, 'Citizen registered!')

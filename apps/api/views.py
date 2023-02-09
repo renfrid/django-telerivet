@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from django.http import HttpResponse
+from django.contrib.auth.models import User, Group
 from django.views.decorators.csrf import csrf_exempt
 from apps.citizen.models import Citizen, Token, CitizenComment
 from apps.menu.models import *
@@ -15,13 +16,13 @@ def webhook(request):
     webhook_secret = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     message = "Welcome to Bukoba Project."
 
-    if request.POST.get('secret') != webhook_secret:
-        return HttpResponse("Invalid webhook secret", 'text/plain', 403)
+    # if request.POST.get('secret') != webhook_secret:
+    #     return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
-    if request.POST.get('event') == 'incoming_message':
-        key = request.POST.get('content')
-        from_number = request.POST.get('from_number')
-        phone_id = request.POST.get('phone_id')
+    if request.GET.get('event') == 'incoming_message':
+        key = request.GET.get('content')
+        from_number = request.GET.get('from_number')
+        phone_id = request.GET.get('phone_id')
 
         print("key => " + key)
         print("from number => " + from_number)
@@ -314,7 +315,23 @@ def create_profile(**kwargs):
         """generate unique number"""
         unique_id = formating.generate_unique_id(designation=citizen.designation)
 
+        """create user before update citizen"""
+        arr_name = name.split(' ', maxsplit=2)
+        first_name = arr_name[0]
+        email = f'{first_name}@jinadi.co.tz'
+
+        """default role"""
+        role = Group.objects.get(name='citizen')
+
+        """register user"""
+        user = User.objects.create_user(username=unique_id, email=email, password=password)
+        user.first_name = first_name
+        user.is_active = False
+        user.groups.add(role)
+        user.save()
+
         """starting update data"""
+        citizen.user_id   = user.id
         citizen.name      = name
         citizen.gender    = gender
         citizen.dob       = dob
@@ -527,7 +544,8 @@ def process_thibitisha_thread(**kwargs):
                         qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
-                        """TODO: create user profile for login to the platform"""
+                        """ update user is_active=True """
+                        user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=True)
 
                         """Inform citizen after verification"""
                         message_to_citizen = "Habari, usajili wako umekamilika. Neno lako la siri ni " + qry_citizen.password +"."
@@ -559,7 +577,8 @@ def process_thibitisha_thread(**kwargs):
                         qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
-                        """TODO: create user profile for login to the platform"""
+                        """ update user is_active=True """
+                        user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=True)
 
                         """Inform citizen after verification"""
                         message_to_citizen = "Habari, usajili wako umekamilika.  Neno lako la siri ni " + qry_citizen.password +"."
@@ -591,7 +610,8 @@ def process_thibitisha_thread(**kwargs):
                         qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
-                        """TODO: create user profile for login to the platform"""
+                        """ update user is_active=True """
+                        user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=True)
 
                         """Inform citizen after verification"""
                         message_to_citizen = "Habari, usajili wako umekamilika.  Neno lako la siri ni " + qry_citizen.password +"."
@@ -689,7 +709,8 @@ def process_thibitisha_thread(**kwargs):
                             qry_citizen.verified_by_id = citizen.id
                             qry_citizen.save()
 
-                            """TODO: create user profile for login to the platform"""
+                            """ update user is_active=True """
+                            user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=True)
 
                             """query for Mwenyekiti"""
                             qry_mwenyekiti = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MWENYEKITI")
@@ -787,7 +808,8 @@ def process_tengua_thread(**kwargs):
                         qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
-                        """TODO: update user status"""
+                        """ update user is_active=False """
+                        user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=False)
 
                         """Inform citizen after verification"""
                         message_to_citizen = "Habari, usajili wako umetenguliwa. Wasiliana mtendaji wako."
@@ -819,7 +841,8 @@ def process_tengua_thread(**kwargs):
                         qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
-                        """TODO: update user status"""
+                        """ update user is_active=False """
+                        user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=False)
 
                         """Inform citizen after verification"""
                         message_to_citizen = "Habari, usajili wako umetenguliwa. Wasiliana mtendaji wako."
@@ -851,7 +874,8 @@ def process_tengua_thread(**kwargs):
                         qry_citizen.verified_by_id = citizen.id
                         qry_citizen.save()
 
-                        """TODO: update user status"""
+                        """ update user is_active=False """
+                        user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=False)
 
                         """Inform citizen after verification"""
                         message_to_citizen = "Habari, usajili wako umetenguliwa. Wasiliana mtendaji wako."
@@ -949,7 +973,8 @@ def process_tengua_thread(**kwargs):
                             qry_citizen.verified_by_id = citizen.id
                             qry_citizen.save()
 
-                            """TODO: update user"""
+                            """ update user is_active=False """
+                            user = User.objects.filter(username=qry_citizen.unique_id).update(is_active=False)
 
                             """query for Mwenyekiti"""
                             qry_mwenyekiti = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MWENYEKITI")

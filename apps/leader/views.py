@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
 from django.db.models import Q
+from django.contrib.auth.models import User, Group
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -117,14 +118,33 @@ class LeaderCreateView(generic.CreateView):
             pin  = formating.generate_pin(pin_size=4)
             phone = formating.format_phone(phone=request.POST.get('phone'))
 
+            """generate unique number"""
+            unique_id = formating.generate_unique_id(designation=designation)
+
+            """create user before update citizen"""
+            arr_name = name.split(' ', maxsplit=2)
+            first_name = arr_name[0]
+            email = f'{first_name}@jinadi.co.tz'
+
+            """default role"""
+            role = Group.objects.get(name='citizen')
+
+            """register user"""
+            user = User.objects.create_user(username=unique_id, email=email, password=pin)
+            user.first_name = first_name
+            user.is_active = True
+            user.groups.add(role)
+            user.save()
+
             """save POST data"""
             dt_leader = form.save(commit=False)
+            dt_leader.user_id   = user.id
             dt_leader.created_by = request.user
             dt_leader.is_active = 1
             dt_leader.status = 'VERIFIED'
             dt_leader.verified_at = datetime.now()
             dt_leader.password = pin
-            dt_leader.unique_id = formating.generate_unique_id(designation=designation)
+            dt_leader.unique_id = unique_id
             dt_leader.phone = phone
             dt_leader.save()
 

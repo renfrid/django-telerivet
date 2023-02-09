@@ -53,6 +53,7 @@ INSTALLED_APPS = [
      'apps.menu',
      'apps.citizen',
      'apps.leader',
+     'apps.users',
      'apps.api'
 ]
 
