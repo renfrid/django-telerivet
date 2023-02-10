@@ -22,13 +22,13 @@
                 </a>
                 <!-- Sidenav Menu Heading (Core)-->
                 <div class="sidenav-menu-heading">JINADI DATA</div>
-                
+
                 <!-- Sidenav Accordion (Dashboard)-->
-                <a class="nav-link" href="{% url 'dashboard' %}" >
+                <a class="nav-link" href="{% url 'dashboard' %}">
                     <div class="nav-link-icon"><i data-feather="activity"></i></div>
                     Dashboards
                 </a>
-                
+
                 <!-- Sidenav Heading (Addons)-->
                 <!-- <div class="sidenav-menu-heading">Surveillance</div> -->
                 <!-- Sidenav Link (Charts)-->
@@ -44,7 +44,8 @@
 
 
                 <!-- Sidenav Accordion (Components)-->
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseComponents" aria-expanded="false" aria-controls="collapseComponents">
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse"
+                    data-bs-target="#collapseComponents" aria-expanded="false" aria-controls="collapseComponents">
                     <div class="nav-link-icon"><i class="fa-solid fa-gears"></i></div>
                     Setup
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -52,9 +53,14 @@
                 <div class="collapse" id="collapseComponents" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
                         <a class="nav-link" href="{% url 'setup:menu' %}">Menu</a>
-                        <a class="nav-link" href="{% url 'setup:menu-links' %}">Menu Links</a>                       
+                        <a class="nav-link" href="{% url 'setup:menu-links' %}">Menu Links</a>
                     </nav>
                 </div>
+
+                <!-- <a class="nav-link" href="#">
+                    <div class="nav-link-icon"><i class="fa-solid fa-people-group"></i></div>
+                    Users
+                </a> -->
 
                 <!-- Sidenav Accordion (Components)-->
                 <!-- <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseLocation" aria-expanded="false" aria-controls="collapseLocation">

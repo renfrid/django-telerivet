@@ -2,7 +2,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.http import JsonResponse
-from apps.account.models import Profile
 from django.contrib.auth.models import User, Group
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required

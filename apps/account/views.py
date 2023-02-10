@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import View
 from .forms import  LoginForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, authenticate, logout
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -40,6 +40,8 @@ class LoginView(View):
                     request.session.set_expiry(expiry)
 
                 # redirect
+                print("authenticated user")
+                print(user)
                 return redirect(self.success_url)
             else:
                 messages.error(request, 'Wrong credentials, try again!')

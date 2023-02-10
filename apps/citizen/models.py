@@ -35,7 +35,7 @@ class Citizen(models.Model):
         ('MWANANCHI', 'MWANANCHI'),
     )
 
-    user              = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    user              = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
     designation       = models.CharField(max_length=30, choices=DESIGNATION_OPTIONS,null=True, blank=True)
     unique_id         = models.CharField(max_length=30, blank=True, null=True)
     name              = models.CharField(max_length=100, blank=True, null=True)
