@@ -16,13 +16,13 @@ def webhook(request):
     webhook_secret = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
     message = "Welcome to Bukoba Project."
 
-    # if request.POST.get('secret') != webhook_secret:
-    #     return HttpResponse("Invalid webhook secret", 'text/plain', 403)
+    if request.POST.get('secret') != webhook_secret:
+        return HttpResponse("Invalid webhook secret", 'text/plain', 403)
 
-    if request.GET.get('event') == 'incoming_message':
-        key = request.GET.get('content')
-        from_number = request.GET.get('from_number')
-        phone_id = request.GET.get('phone_id')
+    if request.POST.get('event') == 'incoming_message':
+        key = request.POST.get('content')
+        from_number = request.POST.get('from_number')
+        phone_id = request.POST.get('phone_id')
 
         print("key => " + key)
         print("from number => " + from_number)
@@ -513,6 +513,7 @@ def process_thibitisha_thread(**kwargs):
     """telerivet wrapper"""
     telerivet = TelerivetWrapper()
 
+    """citizen"""
     citizen = Citizen.objects.filter(phone__exact=from_number)    
 
     message = ""
@@ -531,12 +532,6 @@ def process_thibitisha_thread(**kwargs):
                     qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                     if qry_otp.count() > 0:
-                        qry_otp = qry_otp.first()
-
-                        """update otp to invalid"""
-                        qry_otp.status = 0
-                        qry_otp.save()
-
                         """update citizen to VERIFIED and ACTIVE=1"""
                         qry_citizen.status = 'VERIFIED'
                         qry_citizen.is_active = 1
@@ -564,12 +559,6 @@ def process_thibitisha_thread(**kwargs):
                     qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                     if qry_otp.count() > 0:
-                        qry_otp = qry_otp.first()
-
-                        """update otp to invalid"""
-                        qry_otp.status = 0
-                        qry_otp.save()
-
                         """update citizen to VERIFIED and ACTIVE=1"""
                         qry_citizen.status = 'VERIFIED'
                         qry_citizen.is_active = 1
@@ -597,12 +586,6 @@ def process_thibitisha_thread(**kwargs):
                     qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                     if qry_otp.count() > 0:
-                        qry_otp = qry_otp.first()
-
-                        """update otp to invalid"""
-                        qry_otp.status = 0
-                        qry_otp.save()
-
                         """update citizen to VERIFIED and ACTIVE=1"""
                         qry_citizen.status = 'VERIFIED'
                         qry_citizen.is_active = 1
@@ -631,12 +614,6 @@ def process_thibitisha_thread(**kwargs):
                         qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                         if qry_otp.count() > 0:
-                            qry_otp = qry_otp.first() 
-
-                            """update otp to invalid"""
-                            qry_otp.status = 0
-                            qry_otp.save()
-
                             """update citizen to PARTIAL and ACTIVE=0"""
                             qry_citizen.status = 'PARTIAL'
                             qry_citizen.is_active = 0
@@ -696,12 +673,6 @@ def process_thibitisha_thread(**kwargs):
                         qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                         if qry_otp.count() > 0:
-                            qry_otp = qry_otp.first()
-
-                            """update otp to invalid"""
-                            qry_otp.status = 0
-                            qry_otp.save()
-
                             """update citizen to VERIFIED and ACTIVE=1"""
                             qry_citizen.status = 'VERIFIED'
                             qry_citizen.is_active = 1
@@ -731,7 +702,7 @@ def process_thibitisha_thread(**kwargs):
                             """Message to MJUMBE"""
                             qry_mjumbe = Citizen.objects.filter(village_id=citizen.village_id, is_active=1, designation="MJUMBE")
 
-                            if qry_mwenyekiti.count() > 0:
+                            if qry_mjumbe.count() > 0:
                                 """MJUMBE data"""
                                 qry_mjumbe = qry_mjumbe.last()
                                 qry_mjumbe_phone = qry_mjumbe.phone
@@ -795,12 +766,6 @@ def process_tengua_thread(**kwargs):
                     qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                     if qry_otp.count() > 0:
-                        qry_otp = qry_otp.first()
-
-                        """update otp to invalid"""
-                        qry_otp.status = 0
-                        qry_otp.save()
-
                         """update citizen to UNVERIFIED and ACTIVE=0"""
                         qry_citizen.status = 'UNVERIFIED'
                         qry_citizen.is_active = 0
@@ -828,12 +793,6 @@ def process_tengua_thread(**kwargs):
                     qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                     if qry_otp.count() > 0:
-                        qry_otp = qry_otp.first()
-
-                        """update otp to invalid"""
-                        qry_otp.status = 0
-                        qry_otp.save()
-
                         """update citizen to UNVERIFIED and ACTIVE=0"""
                         qry_citizen.status = 'UNVERIFIED'
                         qry_citizen.is_active = 0
@@ -861,12 +820,6 @@ def process_tengua_thread(**kwargs):
                     qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                     if qry_otp.count() > 0:
-                        qry_otp = qry_otp.first()
-
-                        """update otp to invalid"""
-                        qry_otp.status = 0
-                        qry_otp.save()
-
                         """update citizen to UNVERIFIED and ACTIVE=0"""
                         qry_citizen.status = 'UNVERIFIED'
                         qry_citizen.is_active = 0
@@ -895,12 +848,6 @@ def process_tengua_thread(**kwargs):
                         qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                         if qry_otp.count() > 0:
-                            qry_otp = qry_otp.first() 
-
-                            """update otp to invalid"""
-                            qry_otp.status = 0
-                            qry_otp.save()
-
                             """update citizen to PARTIAL and ACTIVE=0"""
                             qry_citizen.status = 'PARTIAL'
                             qry_citizen.is_active = 0
@@ -960,12 +907,6 @@ def process_tengua_thread(**kwargs):
                         qry_otp = Token.objects.filter(verifier_id=citizen.id, client_id=qry_citizen.id, otp__exact=otp, status=1)
 
                         if qry_otp.count() > 0:
-                            qry_otp = qry_otp.first()
-
-                            """update otp to invalid"""
-                            qry_otp.status = 0
-                            qry_otp.save()
-
                             """update citizen to UNVERIFIED and ACTIVE=0"""
                             qry_citizen.status = 'UNVERIFIED'
                             qry_citizen.is_active = 0
