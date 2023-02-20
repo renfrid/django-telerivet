@@ -24,7 +24,7 @@ class RegistrationWrapper:
         elif '/' in date_in:    
             return datetime.strptime(date_in, '%d/%m/%Y').date() 
         else:
-            return datetime.strptime(date_in, '%d%m%Y').date() 
+            return datetime.strptime('04/01/1990', '%d%m%Y').date() 
 
 
     def format_id_type(self, **kwargs):
