@@ -86,7 +86,8 @@
                             <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                                 <div class="form-group">
                                     <label class="font-weight-500">Unique ID</label>
-                                    <input type="text" class="form-control" name="unique_id" id="unique_id" placeholder="Enter Unique ID" />
+                                    <input type="text" class="form-control" name="unique_id" id="unique_id"
+                                        placeholder="Enter Unique ID" />
                                 </div>
                                 <!--./form-group -->
                             </div>
@@ -97,7 +98,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="text-sm-end">
-                                    <a href="{% url 'leaders:lists' %}" class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
+                                    <a href="{% url 'leaders:lists' %}"
+                                        class="btn btn-outline-danger text-medium btn-sm">Cancel</a>
                                     <button class="btn btn-secondary text-medium btn-sm" type="submit">
                                         Filter
                                     </button>
@@ -158,20 +160,20 @@
                         <td>{{ val.created_at|date:"d-m-Y H:i:s" }}</td>
                         <td>
                             {% if val.status == 'COMPLETED' %}
-                                <label class="badge bg-info">COMPLETED</label>
+                            <label class="badge bg-info">COMPLETED</label>
                             {% elif val.status == 'UNVERIFIED' %}
-                                <label class="badge bg-danger">UNVERIFIED</label>
+                            <label class="badge bg-danger">UNVERIFIED</label>
                             {% elif val.status == 'VERIFIED' %}
-                                <label class="badge bg-success">VERIFIED</label>
+                            <label class="badge bg-success">VERIFIED</label>
                             {% elif val.status == 'PENDING' %}
-                                <label class="badge bg-warning">PENDING</label>
+                            <label class="badge bg-warning">PENDING</label>
                             {% endif %}
                         </td>
                         <td>
                             {% if val.verified_at is not None %}
-                                {{ val.verified_at|date:"d-m-Y H:i:s" }}
+                            {{ val.verified_at|date:"d-m-Y H:i:s" }}
                             {% else %}
-                                N/A
+                            N/A
                             {% endif %}
                         </td>
                         <td>
@@ -191,10 +193,42 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Pagination -->
+            <div class='pagination justify-content-end'>
+                {% if is_paginated %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{page_obj.previous_page_number}}">&laquo;</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">&laquo;</a>
+                    </li>
+                    {% endif %} {% for i in paginator.page_range %} {% if page_obj.number == i %}
+                    <li class="page-item"><a class="page-link active">{{ i }}</a></li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %} {% endfor %} {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a href="?page={{page_obj.next_page_number}}" class="page-link">&raquo;</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link">&raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+            </div>
+            <!-- END Pagination -->
             {% else %}
-                <div class=" mt-4 alert alert-danger">
-                    No any data found
-                </div>
+            <div class=" mt-4 alert alert-danger">
+                No any data found
+            </div>
             {% endif %}
         </div>
     </div>
