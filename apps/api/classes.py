@@ -16,14 +16,12 @@ import telerivet
 class TelerivetWrapper:
     #BASE_URL   = "http://127.0.0.1:8000/"
     BASE_URL   = "https://jinadi.happen.co.tz/"
-    API_TOKEN  = "MA9447RTQAZAT6MWZXX393D9KCU3HEUR"
-    # API_KEY = 'ZaCNa_cgefsjQ3eDLQ8JH33RvMuQ1qQmTT2h'
-    API_KEY = 'c7fAkAuMy8a6aUZQWyNNyYXSutXuszcV'
-    PROJECT_ID = 'PJ592866ba523f191f'
+    API_KEY = 'MA9447RTQAZAT6MWZXX393D9KCU3HEUR'
+    PROJECT_ID = 'PJ219d5087c1ab3829'
 
     def __init__(self):
         self.headers = {
-            "Authorization": f"Bearer {self.API_TOKEN}",
+            "Authorization": f"Bearer {self.API_KEY}",
             "Content-Type": "application/json",
         }
         self.API_URL = self.BASE_URL
